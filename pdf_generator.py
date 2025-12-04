@@ -31,7 +31,7 @@ def create_certificate_pdf(name, verdict, score, comment, template_path):
     # 1. The Name (Prominent, Center)
     # Moved down to y=280
     c.setFont("Helvetica-Bold", 36)
-    c.drawCentredString(center_x, 320, name) 
+    c.drawCentredString(center_x, 240, name) 
 
     c.save()
     packet.seek(0)
