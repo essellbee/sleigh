@@ -832,6 +832,34 @@ else:
         # Verify
         payment_verified = verify_payment(session_id)
 
+        # --- TEST PDF GENERATION (Visible for testing) ---
+        # Reuse logic to determine template
+        is_sleigh_test = score >= 7
+        template_path_test = "assets/certificate_nice.pdf" if is_sleigh_test else "assets/certificate_naughty.pdf"
+        
+        # Use stored name or fallback
+        name_on_cert_test = st.session_state.get("user_name", "Test User")
+        if not name_on_cert_test:
+            name_on_cert_test = "Test User"
+
+        test_pdf_bytes = pdf_generator.create_certificate_pdf(
+            name=name_on_cert_test,
+            verdict=data.get('verdict_title', "Sleigh or Nay?"),
+            score=score,
+            comment=data.get('santa_comment', "Ho Ho Ho!"),
+            template_path=template_path_test
+        )
+        
+        if test_pdf_bytes:
+            st.download_button(
+                label="🛠️ TEST: Download Filled Certificate PDF",
+                data=test_pdf_bytes,
+                file_name="Santa_Certificate_TEST.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
+        # -----------------------------------------------
+
         if payment_verified:
             st.success("Payment Verified! 🎄")
             
