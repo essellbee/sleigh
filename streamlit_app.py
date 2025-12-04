@@ -521,26 +521,12 @@ else:
     is_sleigh = score >= 7
     title_color = "#C93A3C" if is_sleigh else "#5FBA47"  # Red for sleigh, green for nay
     
-    # Layout: Elf Image + Title side by side
-    col1, col2 = st.columns([1, 2])
-    
-    with col1:
-        # Elf Image on the left
-        try:
-            if is_sleigh:
-                st.image("assets/happy_elf.png", use_container_width=True)
-            else:
-                st.image("assets/grumpy_elf.png", use_container_width=True)
-        except:
-            # Fallback to emoji if images not found
-            elf_emoji = "🧝‍♂️😊" if is_sleigh else "🧝‍♂️👎"
-            st.markdown(f"""
-            <div style='font-size:6rem; text-align:center;'>{elf_emoji}</div>
-            """, unsafe_allow_html=True)
-    
-    with col2:
-        # Show verdict title image on the right
-        if is_sleigh:
+    # Layout: Conditional based on verdict
+    if is_sleigh:
+        # Sleigh: Phrase Left (Wide), Elf Right (Narrow)
+        col_text, col_elf = st.columns([2, 1])
+        
+        with col_text:
             try:
                 st.image("assets/sleigh_title.png", use_container_width=True)
             except:
@@ -550,7 +536,28 @@ else:
                     {verdict_title}
                 </div>
                 """, unsafe_allow_html=True)
-        else:
+        
+        with col_elf:
+            try:
+                st.image("assets/happy_elf.png", use_container_width=True)
+            except:
+                st.markdown(f"""
+                <div style='font-size:6rem; text-align:center;'>🧝‍♂️😊</div>
+                """, unsafe_allow_html=True)
+                
+    else:
+        # Nay: Elf Left (Narrow), Phrase Right (Wide)
+        col_elf, col_text = st.columns([1, 2])
+        
+        with col_elf:
+            try:
+                st.image("assets/grumpy_elf.png", use_container_width=True)
+            except:
+                st.markdown(f"""
+                <div style='font-size:6rem; text-align:center;'>🧝‍♂️👎</div>
+                """, unsafe_allow_html=True)
+        
+        with col_text:
             try:
                 st.image("assets/nay_title.png", use_container_width=True)
             except:
