@@ -284,46 +284,91 @@ st.markdown("""
         margin-top: 8px;
     }
 
-    /* File uploader styling - hide the default button */
+    /* File uploader styling - make it look like our buttons */
     .stFileUploader {
         padding: 0 !important;
-        margin-top: 0px;
+        margin: 0 !important;
     }
     
     .stFileUploader > div {
         padding: 0 !important;
     }
     
-    .stFileUploader label {
+    .stFileUploader > label {
         display: none !important;
     }
     
-    /* Hide the default dropzone button completely */
+    /* Style the drag-drop area to look like our green button */
     [data-testid="stFileUploadDropzone"] {
+        background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%) !important;
+        border: none !important;
+        border-radius: 50px !important;
+        padding: 18px 20px !important;
+        box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2) !important;
+        transition: all 0.15s !important;
+        min-height: auto !important;
+        cursor: pointer !important;
+    }
+    
+    [data-testid="stFileUploadDropzone"]:hover {
+        background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%) !important;
+        transform: translateY(-2px);
+        box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25) !important;
+    }
+    
+    [data-testid="stFileUploadDropzone"]:active {
+        transform: translateY(3px);
+        box-shadow: 0px 3px 0px #357A2B, 0px 4px 8px rgba(0,0,0,0.2) !important;
+    }
+    
+    [data-testid="stFileUploadDropzone"] > div {
+        padding: 0 !important;
+        border: none !important;
+    }
+    
+    [data-testid="stFileUploadDropzone"] button {
+        color: white !important;
+        font-family: 'Roboto', sans-serif !important;
+        font-size: 1.1rem !important;
+        font-weight: 900 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        background: transparent !important;
+        border: none !important;
+        width: 100% !important;
+        padding: 0 !important;
+    }
+    
+    [data-testid="stFileUploadDropzone"] svg {
         display: none !important;
     }
     
-    /* Show only when files are uploaded */
-    [data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] {
+    [data-testid="stFileUploadDropzone"] span {
+        color: white !important;
+        font-weight: 900 !important;
+        font-size: 1.1rem !important;
+    }
+    
+    [data-testid="stFileUploadDropzone"] small {
         display: none !important;
     }
     
     /* Make sure uploaded file list is visible */
-    [data-testid="stFileUploader"] section:not([data-testid="stFileUploaderDropzone"]) {
+    [data-testid="stFileUploader"] section {
         background: white !important;
         padding: 10px !important;
         border-radius: 10px !important;
         margin-top: 10px !important;
-        display: block !important;
     }
     
     [data-testid="stFileUploader"] section button {
         color: #333 !important;
-    }
-    
-    /* Custom browse button that will trigger file input */
-    .custom-browse-btn {
-        cursor: pointer;
+        background: #f0f0f0 !important;
+        padding: 5px 10px !important;
+        border-radius: 5px !important;
+        font-size: 0.9rem !important;
+        font-weight: normal !important;
+        text-transform: none !important;
     }
 
     /* Hide Streamlit Branding */
