@@ -71,8 +71,11 @@ st.markdown("""
     .header-logo-wrapper {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between; /* Changed to space-between for left/right layout */
         gap: 15px;
+        padding: 0 20px; /* Added padding for edges */
+        max-width: 800px; /* prevent it from getting too wide on desktop */
+        margin: 0 auto;
     }
     
     .logo-text {
@@ -87,9 +90,18 @@ st.markdown("""
     .header-logo-img {
         max-height: 80px;
         width: auto;
-        max-width: 90%;
+        max-width: 60%; /* Limit width to share space */
         filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         object-fit: contain;
+    }
+    
+    .header-elf-img {
+        max-height: 80px;
+        width: auto;
+        max-width: 30%;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        object-fit: contain;
+        transform: rotate(5deg); /* Jaunty angle for the elf */
     }
     
     .powered-by {
@@ -398,6 +410,8 @@ def get_elf_verdict(images):
 
 # 1. Custom Header Block
 logo_html = ""
+elf_html = ""
+
 try:
     # Try to load the logo.png file
     if os.path.exists("assets/logo.png"):
@@ -406,6 +420,12 @@ try:
     else:
         # Fallback to text if file missing
         logo_html = '<div class="logo-text">Sleigh or Nay?</div>'
+        
+    # Try to load the elf_gpt.png file
+    if os.path.exists("assets/elf_gpt.png"):
+        elf_base64 = get_base64_of_bin_file("assets/elf_gpt.png")
+        elf_html = f'<img src="data:image/png;base64,{elf_base64}" class="header-elf-img" alt="Elf GPT">'
+        
 except Exception as e:
     logo_html = '<div class="logo-text">Sleigh or Nay?</div>'
 
@@ -413,6 +433,7 @@ st.markdown(f"""
 <div class="header-container">
     <div class="header-logo-wrapper">
         {logo_html}
+        {elf_html}
     </div>
     <div class="powered-by">Powered by ELF-GPT 1.0 🧝</div>
 </div>
