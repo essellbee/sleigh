@@ -331,13 +331,14 @@ st.markdown("""
         #ffffff 20px,
         #ffffff 40px
       );
-      background-size: 56px 56px;
+      /* Mathematically calculated for 40px diagonal pattern: 40 * sqrt(2) ≈ 56.57px */
+      background-size: 56.57px 56.57px;
       animation: moveStripes 1s linear infinite;
     }
 
     @keyframes moveStripes {
-      from { background-position: 0 0; }
-      to   { background-position: 56px 56px; }
+      0% { background-position: 0 0; }
+      100% { background-position: 56.57px 0; }
     }
 
     /* Hide Streamlit Branding */
@@ -358,14 +359,11 @@ if 'rotation_angles' not in st.session_state:
 if 'show_camera' not in st.session_state:
     st.session_state.show_camera = False
 
-# --- SIDEBAR (API KEY) ---
-with st.sidebar:
-    st.title("⚙️ Elf Settings")
-    try:
-        api_key = st.secrets["GEMINI_API_KEY"]
-    except:
-        api_key = st.text_input("Enter Gemini API Key", type="password")
-        st.caption("Get one at aistudio.google.com")
+# --- API KEY SETUP ---
+try:
+    api_key = st.secrets["GEMINI_API_KEY"]
+except:
+    api_key = os.environ.get("GEMINI_API_KEY", "")
 
 # --- FUNCTIONS ---
 def get_base64_of_bin_file(bin_file):
@@ -386,7 +384,7 @@ def rotate_image(img, angle):
 def get_elf_verdict(images):
     """Sends images to Gemini and returns JSON verdict."""
     if not api_key:
-        st.error("Please provide an API Key in the sidebar settings!")
+        st.error("Missing API Key! Please set GEMINI_API_KEY in .streamlit/secrets.toml")
         return None
 
     genai.configure(api_key=api_key)
