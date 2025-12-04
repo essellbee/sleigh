@@ -357,6 +357,14 @@ st.markdown("""
         margin-bottom: 5px;
     }
     
+    /* Text input styling for Name field */
+    .stTextInput label {
+        font-family: 'Roboto', sans-serif !important;
+        color: #333 !important;
+        text-align: center !important;
+        width: 100%;
+    }
+    
     /* Candy Cane Progress Bar */
     .progress-container {
       width: 100%;
@@ -407,6 +415,8 @@ if 'rotation_angles' not in st.session_state:
     st.session_state.rotation_angles = {}
 if 'show_camera' not in st.session_state:
     st.session_state.show_camera = False
+if 'user_name' not in st.session_state:
+    st.session_state.user_name = ""
 
 # --- API KEY SETUP ---
 try:
@@ -605,8 +615,17 @@ if st.session_state.result is None:
             
             # Display image as a smaller thumbnail
             st.image(img, width=200)
+            # Rotation button removed
         
         st.markdown("<br>", unsafe_allow_html=True)
+        
+        # --- NAME INPUT ---
+        user_name = st.text_input("Name for Certificate (Optional):", key="user_name_input", placeholder="Enter name here...")
+        if user_name:
+            st.session_state.user_name = user_name
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        
         if st.button("SUBMIT", use_container_width=True):
             if len(all_files) > 5:
                 st.warning("⚠️ Limit 5 photos! The elves can only process so much...")
@@ -816,26 +835,36 @@ else:
         if payment_verified:
             st.success("Payment Verified! 🎄")
             
+            # Select Template based on score/verdict
+            is_sleigh = score >= 7
+            template_path = "assets/certificate_nice.pdf" if is_sleigh else "assets/certificate_naughty.pdf"
+            
+            # Use stored name or fallback
+            name_on_cert = st.session_state.get("user_name", "Valued Elf-Enthusiast")
+            if not name_on_cert:
+                name_on_cert = "Valued Elf-Enthusiast"
+
             # Generate the PDF Certificate using the utility module
             pdf_bytes = pdf_generator.create_certificate_pdf(
+                name=name_on_cert,
                 verdict=data.get('verdict_title', "Sleigh or Nay?"),
                 score=score,
                 comment=data.get('santa_comment', "Ho Ho Ho!"),
-                template_path="assets/certificate_nice.pdf"
+                template_path=template_path
             )
             
             if pdf_bytes:
                 st.download_button(
                     label="📥 DOWNLOAD CERTIFICATE",
                     data=pdf_bytes,
-                    file_name="Santa_Certificate.pdf",
+                    file_name=f"Santa_Certificate_{'Nice' if is_sleigh else 'Naughty'}.pdf",
                     mime="application/pdf",
                     use_container_width=True
                 )
             else:
                 st.error("Certificate generation failed (missing template or libraries).")
                 # Fallback to text file if PDF fails
-                cert_text = f"Verdict: {data.get('verdict_title')}\nScore: {score}/10\n..."
+                cert_text = f"Certificate for: {name_on_cert}\nVerdict: {data.get('verdict_title')}\nScore: {score}/10\n..."
                 st.download_button(
                     label="📥 DOWNLOAD TEXT CERTIFICATE",
                     data=cert_text,
@@ -847,6 +876,7 @@ else:
             if st.button("START OVER", key="restart_paid", use_container_width=True):
                  st.session_state.result = None
                  st.session_state.images = None
+                 st.session_state.user_name = ""
                  st.query_params.clear()
                  st.rerun()
                  
