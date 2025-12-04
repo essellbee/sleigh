@@ -323,6 +323,17 @@ st.markdown("""
     .stFileUploader > div {
         padding: 0 !important;
     }
+
+    /* Center and style the file uploader label to match app text */
+    .stFileUploader label {
+        width: 100%;
+        text-align: center !important;
+        justify-content: center;
+        font-family: 'Roboto', sans-serif !important;
+        color: #333 !important;
+        font-size: clamp(0.9rem, 3vw, 1.05rem) !important;
+        margin-bottom: 5px;
+    }
     
     /* Candy Cane Progress Bar */
     .progress-container {
