@@ -19,27 +19,34 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Roboto:wght@400;700&display=swap');
 
     /* General Background */
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+    }
+    
     .stApp {
         background-color: #ffffff;
         max-width: 500px;
         margin: 0 auto;
+        overflow-x: hidden;
     }
 
-    /* 1. Custom Red Header Bar */
+    /* 1. Custom Red Header Bar - Fixed for mobile */
     .header-container {
         background-color: #C93A3C;
-        padding: 25px 20px;
+        padding: 25px 15px;
         margin-top: -80px;
-        margin-left: -100vw;
-        margin-right: -100vw;
-        padding-left: 100vw;
-        padding-right: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        width: 100vw;
+        max-width: 100vw;
         border-bottom-left-radius: 25px;
         border-bottom-right-radius: 25px;
         text-align: center;
         box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         margin-bottom: 20px;
         position: relative;
+        box-sizing: border-box;
     }
     
     .header-logo-wrapper {
@@ -52,7 +59,7 @@ st.markdown("""
     .logo-text {
         font-family: 'Mountains of Christmas', cursive;
         color: white;
-        font-size: 3rem;
+        font-size: clamp(2rem, 8vw, 3rem);
         line-height: 1;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         margin: 0;
@@ -61,7 +68,7 @@ st.markdown("""
     .powered-by {
         color: white;
         font-family: 'Roboto', sans-serif;
-        font-size: 0.75rem;
+        font-size: clamp(0.65rem, 2vw, 0.75rem);
         font-weight: 600;
         text-transform: uppercase;
         opacity: 0.95;
@@ -74,17 +81,17 @@ st.markdown("""
         text-align: center;
         font-family: 'Roboto', sans-serif;
         color: #333;
-        font-size: 1.05rem;
+        font-size: clamp(0.9rem, 3vw, 1.05rem);
         margin-bottom: 25px;
-        padding: 0 20px;
+        padding: 0 15px;
         line-height: 1.5;
     }
 
     .small-text {
-        font-size: 0.85rem;
+        font-size: clamp(0.75rem, 2.5vw, 0.85rem);
         color: #666;
         text-align: center;
-        margin: 20px 20px;
+        margin: 20px 15px;
         line-height: 1.6;
         font-family: 'Courier New', monospace;
     }
@@ -95,11 +102,11 @@ st.markdown("""
         background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%);
         color: white;
         font-family: 'Roboto', sans-serif;
-        font-size: 1.1rem;
+        font-size: clamp(0.95rem, 3vw, 1.1rem);
         font-weight: 900;
         text-transform: uppercase;
         border-radius: 50px;
-        padding: 18px 20px;
+        padding: 15px 20px;
         border: none;
         box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2);
         transition: all 0.15s;
