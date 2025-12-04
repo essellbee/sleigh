@@ -399,9 +399,10 @@ def get_base64_of_bin_file(bin_file):
     return base64.b64encode(data).decode()
 
 def load_image_preserve_orientation(file):
-    """Load image and preserve original orientation without auto-rotation"""
+    """Load image and fix orientation based on EXIF data"""
     img = Image.open(file)
-    # Don't apply EXIF orientation - keep as-is
+    # specific fix for mobile uploads to ensure they don't rotate
+    img = ImageOps.exif_transpose(img)
     return img
 
 def rotate_image(img, angle):
