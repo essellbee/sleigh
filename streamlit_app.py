@@ -137,11 +137,11 @@ st.markdown("""
         font-family: 'Courier New', monospace;
     }
 
-    /* 3. Button Styling (Green Pill) */
-    div.stButton > button {
+    /* 3. Button Styling (Green Pill) - Updated to include Link Buttons */
+    div.stButton > button, div.stLinkButton > a {
         width: 100%;
         background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%);
-        color: white;
+        color: white !important;
         font-family: 'Roboto', sans-serif;
         font-size: clamp(0.95rem, 3vw, 1.1rem);
         font-weight: 900;
@@ -152,17 +152,25 @@ st.markdown("""
         box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2);
         transition: all 0.15s;
         letter-spacing: 0.5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
     }
 
-    div.stButton > button:hover {
+    div.stButton > button:hover, div.stLinkButton > a:hover {
         background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%);
         transform: translateY(-2px);
         box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25);
+        color: white !important;
+        border: none;
     }
     
-    div.stButton > button:active {
+    div.stButton > button:active, div.stLinkButton > a:active {
         transform: translateY(3px);
         box-shadow: 0px 3px 0px #357A2B, 0px 4px 8px rgba(0,0,0,0.2);
+        color: white !important;
+        border: none;
     }
 
     /* Camera/Upload buttons in two-column layout */
@@ -738,9 +746,7 @@ else:
     col_left, col_center, col_right = st.columns([1, 4, 1])
 
     with col_center:
-        if st.button("DOWNLOAD YOUR CERTIFICATE", use_container_width=True):
-             st.toast("🖨️ Printing at North Pole HQ...", icon="🎄")
-             st.balloons()
+        st.link_button("🏆 BUY OFFICIAL CERTIFICATE", "https://buy.stripe.com/dRm8wQcNt33n0FO9pAasg00", use_container_width=True)
              
         if st.button("POST YOUR ROAST", use_container_width=True):
             share_text = f"{verdict_title}\n\nScore: {score}/10\n\n{data.get('roast_content', '')[:100]}..."
