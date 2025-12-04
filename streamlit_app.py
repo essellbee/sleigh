@@ -58,14 +58,6 @@ st.markdown("""
         margin: 0;
     }
     
-    .elf-icon {
-        width: 60px;
-        height: 60px;
-        background: white;
-        border-radius: 50%;
-        padding: 5px;
-    }
-    
     .powered-by {
         color: white;
         font-family: 'Roboto', sans-serif;
@@ -202,20 +194,6 @@ st.markdown("""
         display: block;
         border-radius: 5px;
     }
-    
-    .gold-frame-label {
-        position: absolute;
-        bottom: 15px;
-        left: 0;
-        right: 0;
-        font-size: 0.75rem;
-        font-family: 'Mountains of Christmas', cursive;
-        color: #5FBA47;
-        text-transform: uppercase;
-        text-align: center;
-        letter-spacing: 1px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-    }
 
     /* 5. Result Typography */
     .verdict-title {
@@ -284,7 +262,7 @@ st.markdown("""
         margin-top: 8px;
     }
 
-    /* File uploader styling - make it look like standard button */
+    /* File uploader styling */
     .stFileUploader {
         padding: 0 !important;
         margin: 0 !important;
@@ -292,95 +270,6 @@ st.markdown("""
     
     .stFileUploader > div {
         padding: 0 !important;
-    }
-    
-    .stFileUploader > label > div > div > p {
-        display: none !important;
-    }
-    
-    /* Style the file uploader button container */
-    [data-testid="stFileUploadDropzone"] {
-        background: transparent !important;
-        border: none !important;
-        padding: 0 !important;
-        min-height: auto !important;
-    }
-    
-    [data-testid="stFileUploadDropzone"] > div {
-        padding: 0 !important;
-        border: none !important;
-        background: transparent !important;
-    }
-    
-    /* Style the actual "Browse files" button to match our green buttons */
-    [data-testid="stFileUploadDropzone"] button {
-        width: 100% !important;
-        background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%) !important;
-        color: white !important;
-        font-family: 'Roboto', sans-serif !important;
-        font-size: 1.1rem !important;
-        font-weight: 900 !important;
-        text-transform: uppercase !important;
-        border-radius: 50px !important;
-        padding: 18px 20px !important;
-        border: none !important;
-        box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2) !important;
-        transition: all 0.15s !important;
-        letter-spacing: 0.5px !important;
-        cursor: pointer !important;
-    }
-    
-    [data-testid="stFileUploadDropzone"] button:hover {
-        background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25) !important;
-    }
-    
-    [data-testid="stFileUploadDropzone"] button:active {
-        transform: translateY(3px) !important;
-        box-shadow: 0px 3px 0px #357A2B, 0px 4px 8px rgba(0,0,0,0.2) !important;
-    }
-    
-    /* Hide the icon inside the button */
-    [data-testid="stFileUploadDropzone"] button svg {
-        display: none !important;
-    }
-    
-    /* Style the text */
-    [data-testid="stFileUploadDropzone"] button span {
-        color: white !important;
-        font-weight: 900 !important;
-    }
-    
-    /* Hide drag and drop text */
-    [data-testid="stFileUploadDropzone"] small {
-        display: none !important;
-    }
-    
-    /* Make sure uploaded file list is visible and styled */
-    [data-testid="stFileUploader"] section {
-        background: #f8f8f8 !important;
-        padding: 10px !important;
-        border-radius: 10px !important;
-        margin-top: 10px !important;
-        border: 1px solid #ddd !important;
-    }
-    
-    [data-testid="stFileUploader"] section button {
-        color: #333 !important;
-        background: #e0e0e0 !important;
-        padding: 5px 10px !important;
-        border-radius: 5px !important;
-        font-size: 0.9rem !important;
-        font-weight: 600 !important;
-        text-transform: none !important;
-        box-shadow: none !important;
-        border: 1px solid #ccc !important;
-    }
-    
-    [data-testid="stFileUploader"] section button:hover {
-        background: #d0d0d0 !important;
-        transform: none !important;
     }
 
     /* Hide Streamlit Branding */
@@ -409,6 +298,16 @@ with st.sidebar:
         st.caption("Get one at aistudio.google.com")
 
 # --- FUNCTIONS ---
+def load_image_preserve_orientation(file):
+    """Load image and preserve original orientation without auto-rotation"""
+    img = Image.open(file)
+    # Don't apply EXIF orientation - keep as-is
+    return img
+
+def rotate_image(img, angle):
+    """Rotate image by specified angle"""
+    return img.rotate(angle, expand=True)
+
 def get_elf_verdict(images):
     """Sends images to Gemini and returns JSON verdict."""
     if not api_key:
@@ -444,16 +343,6 @@ def get_elf_verdict(images):
         st.error(f"Elf-GPT crashed: {e}")
         return None
 
-def load_image_preserve_orientation(file):
-    """Load image and preserve original orientation without auto-rotation"""
-    img = Image.open(file)
-    # Don't apply EXIF orientation - keep as-is
-    return img
-
-def rotate_image(img, angle):
-    """Rotate image by specified angle"""
-    return img.rotate(angle, expand=True)
-
 # --- MAIN UI ---
 
 # 1. Custom Header Block
@@ -473,74 +362,22 @@ if st.session_state.result is None:
     
     st.markdown('<div class="intro-text">Santa is jumping on the AI bandwagon and outsourcing.</div>', unsafe_allow_html=True)
     
-    # Camera and Upload buttons side by side
-    col1, col2 = st.columns(2)
+    # Use native Streamlit camera input
+    camera_photo = st.camera_input("📸 Take a photo of your Christmas spirit!", key="camera")
     
-    with col1:
-        if not st.session_state.show_camera and not st.session_state.camera_photo:
-            if st.button("📸 TAKE PHOTO", use_container_width=True):
-                st.session_state.show_camera = True
-                st.rerun()
-        elif st.session_state.camera_photo:
-            if st.button("📸 RETAKE", use_container_width=True):
-                st.session_state.camera_photo = None
-                st.session_state.show_camera = True
-                st.rerun()
-    
-    with col2:
-        # This is a placeholder - the actual file uploader will be below
-        if st.button("📁 BROWSE FILES", use_container_width=True, key="browse_trigger"):
-            # This button is just for visual consistency
-            # The actual file uploader below handles the functionality
-            pass
-    
-    # Show camera input only when toggled
-    if st.session_state.show_camera:
-        st.markdown("### 📸 Smile for the camera!")
-        camera_photo = st.camera_input("", key="camera", label_visibility="collapsed")
-        if camera_photo:
-            st.session_state.camera_photo = camera_photo
-            st.session_state.show_camera = False
-            st.rerun()
-        
-        # Option to grant camera access if blocked
-        st.caption("🔒 Camera blocked? Check your browser settings or refresh the page to grant access.")
-    
-    # Show captured photo thumbnail
-    if st.session_state.camera_photo:
-        st.success("✅ Photo captured!")
-        camera_img = load_image_preserve_orientation(st.session_state.camera_photo)
-        
-        # Get rotation angle for camera photo
-        camera_key = "camera_photo"
-        if camera_key not in st.session_state.rotation_angles:
-            st.session_state.rotation_angles[camera_key] = 0
-        
-        # Apply rotation if any
-        if st.session_state.rotation_angles[camera_key] != 0:
-            camera_img = rotate_image(camera_img, st.session_state.rotation_angles[camera_key])
-        
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            st.image(camera_img, caption="Your photo", width=200)
-        with col2:
-            if st.button("🔄", key="rotate_camera", help="Rotate photo 90°"):
-                st.session_state.rotation_angles[camera_key] = (st.session_state.rotation_angles[camera_key] - 90) % 360
-                st.rerun()
-    
-    # File uploader (styled to match buttons)
+    # File uploader
     uploaded_files = st.file_uploader(
-        "📁 Browse for Photos", 
+        "📁 Or upload photos from your device", 
         type=['png', 'jpg', 'jpeg'], 
         accept_multiple_files=True,
-        help="Upload up to 5 photos",
-        label_visibility="collapsed"
+        key="file_uploader",
+        help="Upload up to 5 photos"
     )
 
     # Combine camera photo with uploaded files
     all_files = []
-    if st.session_state.camera_photo:
-        all_files.append(st.session_state.camera_photo)
+    if camera_photo:
+        all_files.append(camera_photo)
     if uploaded_files:
         all_files.extend(uploaded_files)
 
@@ -609,6 +446,29 @@ if st.session_state.result is None:
                     # Clear rotations when submitting
                     st.session_state.rotation_angles = {}
                     st.rerun()
+    
+    st.markdown("""
+    <div class="small-text">
+        Manual judgment is unscalable. I replaced 4,000 elves with this AI. 
+        Upload your data for immediate Q4 processing.
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Video Frame with image
+    st.markdown('<div class="gold-frame">', unsafe_allow_html=True)
+    
+    st.markdown("""
+        <div style="position: relative; padding-top: 56.25%;">
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+                        display: flex; align-items: center; justify-content: center;
+                        font-family: 'Mountains of Christmas', cursive; font-size: 1.3rem; color: white;">
+                🎅<br>A MESSAGE FROM<br>THE NORTH POLE
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
 else:
     # --- SCREEN 2: RESULTS ---
     
@@ -619,8 +479,7 @@ else:
     is_sleigh = score >= 7
     title_color = "#C93A3C" if is_sleigh else "#5FBA47"  # Red for sleigh, green for nay
     
-    # Determine which elf image to use (you'll need to save these as files)
-    # For now using emoji, but replace with: st.image("happy_elf.png") or st.image("grumpy_elf.png")
+    # Determine which elf image to use
     elf_emoji = "🧝‍♂️😊" if is_sleigh else "🧝‍♂️👎"
 
     # 1. The Verdict Title
@@ -640,7 +499,6 @@ else:
         <div style='font-size:6rem;'>{elf_emoji}</div>
     </div>
     """, unsafe_allow_html=True)
-    # To use actual images: st.image("happy_elf.png" if is_sleigh else "grumpy_elf.png", width=200)
     
     # Feedback text
     st.markdown(f"""
