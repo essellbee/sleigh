@@ -284,7 +284,7 @@ st.markdown("""
         margin-top: 8px;
     }
 
-    /* File uploader styling - make it look like our buttons */
+    /* File uploader styling - make it look like standard button */
     .stFileUploader {
         padding: 0 !important;
         margin: 0 !important;
@@ -294,81 +294,93 @@ st.markdown("""
         padding: 0 !important;
     }
     
-    .stFileUploader > label {
+    .stFileUploader > label > div > div > p {
         display: none !important;
     }
     
-    /* Style the drag-drop area to look like our green button */
+    /* Style the file uploader button container */
     [data-testid="stFileUploadDropzone"] {
-        background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%) !important;
+        background: transparent !important;
         border: none !important;
-        border-radius: 50px !important;
-        padding: 18px 20px !important;
-        box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2) !important;
-        transition: all 0.15s !important;
+        padding: 0 !important;
         min-height: auto !important;
-        cursor: pointer !important;
-    }
-    
-    [data-testid="stFileUploadDropzone"]:hover {
-        background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%) !important;
-        transform: translateY(-2px);
-        box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25) !important;
-    }
-    
-    [data-testid="stFileUploadDropzone"]:active {
-        transform: translateY(3px);
-        box-shadow: 0px 3px 0px #357A2B, 0px 4px 8px rgba(0,0,0,0.2) !important;
     }
     
     [data-testid="stFileUploadDropzone"] > div {
         padding: 0 !important;
         border: none !important;
+        background: transparent !important;
     }
     
+    /* Style the actual "Browse files" button to match our green buttons */
     [data-testid="stFileUploadDropzone"] button {
+        width: 100% !important;
+        background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%) !important;
         color: white !important;
         font-family: 'Roboto', sans-serif !important;
         font-size: 1.1rem !important;
         font-weight: 900 !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
-        background: transparent !important;
+        border-radius: 50px !important;
+        padding: 18px 20px !important;
         border: none !important;
-        width: 100% !important;
-        padding: 0 !important;
+        box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2) !important;
+        transition: all 0.15s !important;
+        letter-spacing: 0.5px !important;
+        cursor: pointer !important;
     }
     
-    [data-testid="stFileUploadDropzone"] svg {
+    [data-testid="stFileUploadDropzone"] button:hover {
+        background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25) !important;
+    }
+    
+    [data-testid="stFileUploadDropzone"] button:active {
+        transform: translateY(3px) !important;
+        box-shadow: 0px 3px 0px #357A2B, 0px 4px 8px rgba(0,0,0,0.2) !important;
+    }
+    
+    /* Hide the icon inside the button */
+    [data-testid="stFileUploadDropzone"] button svg {
         display: none !important;
     }
     
-    [data-testid="stFileUploadDropzone"] span {
+    /* Style the text */
+    [data-testid="stFileUploadDropzone"] button span {
         color: white !important;
         font-weight: 900 !important;
-        font-size: 1.1rem !important;
     }
     
+    /* Hide drag and drop text */
     [data-testid="stFileUploadDropzone"] small {
         display: none !important;
     }
     
-    /* Make sure uploaded file list is visible */
+    /* Make sure uploaded file list is visible and styled */
     [data-testid="stFileUploader"] section {
-        background: white !important;
+        background: #f8f8f8 !important;
         padding: 10px !important;
         border-radius: 10px !important;
         margin-top: 10px !important;
+        border: 1px solid #ddd !important;
     }
     
     [data-testid="stFileUploader"] section button {
         color: #333 !important;
-        background: #f0f0f0 !important;
+        background: #e0e0e0 !important;
         padding: 5px 10px !important;
         border-radius: 5px !important;
         font-size: 0.9rem !important;
-        font-weight: normal !important;
+        font-weight: 600 !important;
         text-transform: none !important;
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+    }
+    
+    [data-testid="stFileUploader"] section button:hover {
+        background: #d0d0d0 !important;
+        transform: none !important;
     }
 
     /* Hide Streamlit Branding */
