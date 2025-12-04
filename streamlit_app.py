@@ -135,35 +135,39 @@ st.markdown("""
     .camera-upload-row > div {
         flex: 1;
     }
-
-    /* Hide default file uploader and style custom button */
-    [data-testid="stFileUploader"] {
-        display: none;
+    
+    /* Improve caption visibility */
+    .stApp p, .stApp caption, .stApp small {
+        color: #555 !important;
     }
     
-    .custom-file-upload {
-        width: 100%;
-        background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%);
-        color: white;
-        font-family: 'Roboto', sans-serif;
-        font-size: 1.1rem;
-        font-weight: 900;
-        text-transform: uppercase;
-        border-radius: 50px;
-        padding: 18px 20px;
-        border: none;
-        box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2);
-        transition: all 0.15s;
-        letter-spacing: 0.5px;
-        text-align: center;
-        cursor: pointer;
-        display: inline-block;
+    /* Success messages */
+    .stSuccess {
+        background-color: #d4edda !important;
+        color: #155724 !important;
+        border: 1px solid #c3e6cb !important;
+        border-radius: 10px !important;
+        padding: 12px !important;
+        font-weight: 600 !important;
     }
     
-    .custom-file-upload:hover {
-        background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%);
-        transform: translateY(-2px);
-        box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25);
+    /* Warning messages */
+    .stWarning {
+        background-color: #fff3cd !important;
+        color: #856404 !important;
+        border: 1px solid #ffeaa7 !important;
+        border-radius: 10px !important;
+        padding: 12px !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Info messages */
+    .stInfo {
+        background-color: #d1ecf1 !important;
+        color: #0c5460 !important;
+        border: 1px solid #bee5eb !important;
+        border-radius: 10px !important;
+        padding: 12px !important;
     }
 
     /* Secondary Button (Grey for Share/Reset) */
@@ -244,7 +248,7 @@ st.markdown("""
         font-family: 'Roboto', sans-serif;
         font-size: 0.95rem;
         line-height: 1.6;
-        color: #333;
+        color: #222 !important;
         text-align: center;
     }
     
@@ -267,19 +271,23 @@ st.markdown("""
     .santa-comment-box strong {
         font-family: 'Mountains of Christmas', cursive;
         font-size: 1.3rem;
-        color: #C93A3C;
+        color: #C93A3C !important;
     }
     
     .santa-comment-box em {
         font-family: 'Roboto', sans-serif;
-        color: #555;
+        color: #333 !important;
         font-size: 0.95rem;
         line-height: 1.5;
+        font-style: normal;
+        display: block;
+        margin-top: 8px;
     }
 
     /* File uploader styling */
     .stFileUploader {
         padding: 0 !important;
+        margin-top: 20px;
     }
     
     .stFileUploader > div {
@@ -287,26 +295,24 @@ st.markdown("""
     }
     
     .stFileUploader label {
-        font-family: 'Roboto', sans-serif;
-        font-size: 1rem;
-        color: #333;
         display: none !important;
     }
     
     /* Style the drag-drop area */
     [data-testid="stFileUploadDropzone"] {
-        background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%);
+        background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%) !important;
         border: none !important;
-        border-radius: 50px;
-        padding: 18px 20px;
-        box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2);
-        transition: all 0.15s;
+        border-radius: 50px !important;
+        padding: 18px 20px !important;
+        box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2) !important;
+        transition: all 0.15s !important;
+        min-height: 60px !important;
     }
     
     [data-testid="stFileUploadDropzone"]:hover {
-        background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%);
+        background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%) !important;
         transform: translateY(-2px);
-        box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25);
+        box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25) !important;
     }
     
     [data-testid="stFileUploadDropzone"] button {
@@ -316,19 +322,37 @@ st.markdown("""
         font-weight: 900 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.5px !important;
+        background: transparent !important;
+        border: none !important;
+        width: 100% !important;
     }
     
     [data-testid="stFileUploadDropzone"] svg {
-        display: none;
+        fill: white !important;
+        margin-right: 10px;
     }
     
     [data-testid="stFileUploadDropzone"] span {
         color: white !important;
         font-weight: 900 !important;
+        font-size: 1.1rem !important;
     }
     
     [data-testid="stFileUploadDropzone"] small {
-        display: none !important;
+        color: rgba(255,255,255,0.8) !important;
+        font-size: 0.8rem !important;
+    }
+    
+    /* Make sure uploaded file list is visible */
+    [data-testid="stFileUploader"] section {
+        background: white !important;
+        padding: 10px !important;
+        border-radius: 10px !important;
+        margin-top: 10px !important;
+    }
+    
+    [data-testid="stFileUploader"] section button {
+        color: #333 !important;
     }
 
     /* Hide Streamlit Branding */
