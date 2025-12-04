@@ -29,17 +29,19 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Roboto:wght@400;700&display=swap');
 
-    /* General Background */
-    html, body {
-        overflow-x: hidden;
+    /* General Background & Scrollbar Fix */
+    html, body, [data-testid="stAppViewContainer"] {
+        overflow-x: hidden !important;
         width: 100%;
+        margin: 0;
+        padding: 0;
     }
     
     .stApp {
         background-color: #ffffff;
         max-width: 500px;
         margin: 0 auto;
-        overflow-x: hidden;
+        overflow-x: hidden !important; /* Force hidden overflow */
         text-align: center;
     }
 
@@ -47,6 +49,7 @@ st.markdown("""
     .block-container {
         padding-top: 0 !important;
         padding-bottom: 0 !important;
+        overflow-x: hidden !important; /* Ensure content container doesn't scroll */
     }
     
     /* Center all text elements */
@@ -57,8 +60,8 @@ st.markdown("""
     /* 1. Custom Red Header Bar - Fixed for mobile */
     .header-container {
         background-color: #C93A3C;
-        padding: 25px 0; /* Removed horizontal padding here, handled in wrapper */
-        margin-top: -30px; /* Negative margin to pull header up and remove whitespace */
+        padding: 25px 0; 
+        margin-top: -30px; 
         
         /* Breakout Logic */
         position: relative;
