@@ -7,6 +7,7 @@ import json
 import base64
 import os
 import threading
+import streamlit.components.v1 as components
 
 # Try to import stripe for secure verification
 try:
@@ -22,6 +23,19 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+# --- GOOGLE ANALYTICS ---
+components.html("""
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BHFXECGVNC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BHFXECGVNC');
+</script>
+""", height=0)
 
 # --- CUSTOM CSS (The "App" Look) ---
 st.markdown("""
