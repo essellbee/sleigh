@@ -576,6 +576,25 @@ if st.session_state.result is None:
                     st.session_state.rotation_angles = {}
                     st.rerun()
 
+    # Video Frame with image
+    st.markdown('<div class="gold-frame">', unsafe_allow_html=True)
+    
+    # Try to load the Santa frame image, fallback to text if not found
+    try:
+        st.image("assets/santa_frame.png", use_container_width=True)
+    except:
+        st.markdown("""
+            <div style="position: relative; padding-top: 56.25%;">
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+                            display: flex; align-items: center; justify-content: center;
+                            font-family: 'Mountains of Christmas', cursive; font-size: 1.3rem; color: #5FBA47;">
+                    🎅<br>A MESSAGE FROM<br>THE NORTH POLE
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
 else:
     # --- SCREEN 2: RESULTS ---
     
