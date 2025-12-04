@@ -9,6 +9,9 @@ import os
 import threading
 import streamlit.components.v1 as components
 
+# Import the new PDF generator
+import pdf_generator
+
 # Try to import stripe for secure verification
 try:
     import stripe
@@ -813,26 +816,33 @@ else:
         if payment_verified:
             st.success("Payment Verified! 🎄")
             
-            # Create a simple certificate text
-            cert_text = f"""
-            OFFICIAL NORTH POLE CERTIFICATE
-            --------------------------------
-            Verdict: {data.get('verdict_title')}
-            Score: {score}/10
-            
-            Santa's Comment: {data.get('santa_comment')}
-            
-            Certified by Elf-GPT 1.0
-            Date: {time.strftime('%Y-%m-%d')}
-            """
-            
-            st.download_button(
-                label="📥 DOWNLOAD CERTIFICATE",
-                data=cert_text,
-                file_name="Santa_Certificate.txt",
-                mime="text/plain",
-                use_container_width=True
+            # Generate the PDF Certificate using the utility module
+            pdf_bytes = pdf_generator.create_certificate_pdf(
+                verdict=data.get('verdict_title', "Sleigh or Nay?"),
+                score=score,
+                comment=data.get('santa_comment', "Ho Ho Ho!"),
+                template_path="assets/certificate_nice.pdf"
             )
+            
+            if pdf_bytes:
+                st.download_button(
+                    label="📥 DOWNLOAD CERTIFICATE",
+                    data=pdf_bytes,
+                    file_name="Santa_Certificate.pdf",
+                    mime="application/pdf",
+                    use_container_width=True
+                )
+            else:
+                st.error("Certificate generation failed (missing template or libraries).")
+                # Fallback to text file if PDF fails
+                cert_text = f"Verdict: {data.get('verdict_title')}\nScore: {score}/10\n..."
+                st.download_button(
+                    label="📥 DOWNLOAD TEXT CERTIFICATE",
+                    data=cert_text,
+                    file_name="Santa_Certificate.txt",
+                    mime="text/plain",
+                    use_container_width=True
+                )
             
             if st.button("START OVER", key="restart_paid", use_container_width=True):
                  st.session_state.result = None
