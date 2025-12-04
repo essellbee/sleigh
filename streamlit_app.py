@@ -307,11 +307,43 @@ st.markdown("""
     .stFileUploader > div {
         padding: 0 !important;
     }
+    
+    /* Candy Cane Progress Bar */
+    .progress-container {
+      width: 100%;
+      height: 30px;
+      border-radius: 15px;
+      border: 2px solid #C93A3C;
+      overflow: hidden;
+      background: #fff;
+      box-sizing: border-box;
+      margin: 10px 0;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      background: repeating-linear-gradient(
+        45deg,
+        #C93A3C 0px,
+        #C93A3C 20px,
+        #ffffff 20px,
+        #ffffff 40px
+      );
+      background-size: 56px 56px;
+      animation: moveStripes 1s linear infinite;
+    }
+
+    @keyframes moveStripes {
+      from { background-position: 0 0; }
+      to   { background-position: 56px 56px; }
+    }
 
     /* Hide Streamlit Branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    #MainMenu {display: none;}
+    footer {display: none;}
+    header {display: none;}
     
 </style>
 """, unsafe_allow_html=True)
@@ -508,10 +540,20 @@ if st.session_state.result is None:
                 
                 st.session_state.images = pil_images
                 
-                # Show spinner while processing
-                with st.spinner("🎄 Elf-GPT is analyzing your Christmas spirit... Please wait!"):
-                    # Actually call the API (this is where the real time is spent)
-                    result = get_elf_verdict(pil_images)
+                # Show custom progress bar
+                progress_placeholder = st.empty()
+                progress_placeholder.markdown("""
+                    <div class="progress-container">
+                      <div class="progress-bar"></div>
+                    </div>
+                    <p style="text-align: center; font-style: italic; color: #666;">🎄 Elf-GPT is checking the list twice...</p>
+                """, unsafe_allow_html=True)
+                
+                # Actually call the API (this is where the real time is spent)
+                result = get_elf_verdict(pil_images)
+                
+                # Clear progress bar
+                progress_placeholder.empty()
                 
                 if result:
                     st.session_state.result = result
