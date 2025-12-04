@@ -31,26 +31,7 @@ def create_certificate_pdf(name, verdict, score, comment, template_path):
     # 1. The Name (Prominent, Center)
     # Moved down to y=280
     c.setFont("Helvetica-Bold", 36)
-    c.drawCentredString(center_x, 280, name) 
-    
-    # 2. The Verdict (Sleigh or Nay)
-    # Moved down to y=220
-    c.setFont("Helvetica-Bold", 24)
-    c.drawCentredString(center_x, 220, verdict)
-    
-    # 3. The Score
-    # Moved down to y=190
-    c.setFont("Helvetica", 18)
-    c.drawCentredString(center_x, 190, f"Spirit Score: {score}/10")
-    
-    # 4. The Comment (Santa's Roast/Praise)
-    # Moved down to y=160
-    c.setFont("Helvetica-Oblique", 12)
-    # Simple truncation to prevent overflow
-    clean_comment = comment.replace('\n', ' ')
-    if len(clean_comment) > 90:
-        clean_comment = clean_comment[:90] + "..."
-    c.drawCentredString(center_x, 160, f'"{clean_comment}"')
+    c.drawCentredString(center_x, 320, name) 
 
     c.save()
     packet.seek(0)
