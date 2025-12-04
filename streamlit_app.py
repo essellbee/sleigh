@@ -509,45 +509,48 @@ else:
     is_sleigh = score >= 7
     title_color = "#C93A3C" if is_sleigh else "#5FBA47"  # Red for sleigh, green for nay
     
-    # Show verdict title image
-    if is_sleigh:
-        try:
-            st.image("assets/sleigh_title.png", use_container_width=True)
-        except:
-            verdict_title = data.get("verdict_title", "IT'S A TOTAL SLEIGH!")
-            st.markdown(f"""
-            <div class="verdict-title" style="color: {title_color};">
-                {verdict_title}
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        try:
-            st.image("assets/nay_title.png", use_container_width=True)
-        except:
-            verdict_title = data.get("verdict_title", "BAH HUMBUG... SO NAY.")
-            st.markdown(f"""
-            <div class="verdict-title" style="color: {title_color};">
-                {verdict_title}
-            </div>
-            """, unsafe_allow_html=True)
-
-    # 2. Elf Feedback Section
-    st.markdown('<div class="elf-feedback-section">', unsafe_allow_html=True)
+    # Layout: Elf Image + Title side by side
+    col1, col2 = st.columns([1, 2])
     
-    # Elf Image (centered) - use actual images
-    try:
+    with col1:
+        # Elf Image on the left
+        try:
+            if is_sleigh:
+                st.image("assets/happy_elf.png", use_container_width=True)
+            else:
+                st.image("assets/grumpy_elf.png", use_container_width=True)
+        except:
+            # Fallback to emoji if images not found
+            elf_emoji = "🧝‍♂️😊" if is_sleigh else "🧝‍♂️👎"
+            st.markdown(f"""
+            <div style='font-size:6rem; text-align:center;'>{elf_emoji}</div>
+            """, unsafe_allow_html=True)
+    
+    with col2:
+        # Show verdict title image on the right
         if is_sleigh:
-            st.image("assets/happy_elf.png", width=200)
+            try:
+                st.image("assets/sleigh_title.png", use_container_width=True)
+            except:
+                verdict_title = data.get("verdict_title", "IT'S A TOTAL SLEIGH!")
+                st.markdown(f"""
+                <div class="verdict-title" style="color: {title_color};">
+                    {verdict_title}
+                </div>
+                """, unsafe_allow_html=True)
         else:
-            st.image("assets/grumpy_elf.png", width=200)
-    except:
-        # Fallback to emoji if images not found
-        elf_emoji = "🧝‍♂️😊" if is_sleigh else "🧝‍♂️👎"
-        st.markdown(f"""
-        <div class="elf-image-container">
-            <div style='font-size:6rem;'>{elf_emoji}</div>
-        </div>
-        """, unsafe_allow_html=True)
+            try:
+                st.image("assets/nay_title.png", use_container_width=True)
+            except:
+                verdict_title = data.get("verdict_title", "BAH HUMBUG... SO NAY.")
+                st.markdown(f"""
+                <div class="verdict-title" style="color: {title_color};">
+                    {verdict_title}
+                </div>
+                """, unsafe_allow_html=True)
+
+    # 2. Feedback Section (all content below)
+    st.markdown('<div class="elf-feedback-section">', unsafe_allow_html=True)
     
     # Feedback text
     st.markdown(f"""
