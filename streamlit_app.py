@@ -73,10 +73,10 @@ st.markdown("""
         align-items: center;
         justify-content: space-between; 
         gap: 10px;
-        padding: 0 20px; /* Standard padding to align items to the left and right edges */
+        padding: 0 20px; /* Standard safety padding for mobile edges */
         width: 100%;
-        max-width: 100%; /* Allow full width so items go to the edges */
-        margin: 0 auto;
+        max-width: 700px; /* Constrain content width to match app layout */
+        margin: 0 auto; /* Center the wrapper within the full-width red bar */
         box-sizing: border-box;
     }
     
