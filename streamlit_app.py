@@ -228,7 +228,7 @@ st.markdown("""
         border-radius: 15px;
         background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
         padding: 0;
-        margin: 30px 15px;
+        margin: 5px 15px 30px 15px; /* Reduced top margin to remove gap */
         box-shadow: 
             0 8px 20px rgba(0,0,0,0.4),
             inset 0 0 30px rgba(0,0,0,0.6),
