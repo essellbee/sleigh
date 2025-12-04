@@ -4,6 +4,8 @@ from PIL import Image, ImageOps
 import time
 import random
 import json
+import base64
+import os
 
 # --- APP CONFIGURATION ---
 st.set_page_config(
@@ -79,6 +81,14 @@ st.markdown("""
         line-height: 1;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         margin: 0;
+    }
+
+    .header-logo-img {
+        max-height: 80px;
+        width: auto;
+        max-width: 90%;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        object-fit: contain;
     }
     
     .powered-by {
@@ -326,6 +336,11 @@ with st.sidebar:
         st.caption("Get one at aistudio.google.com")
 
 # --- FUNCTIONS ---
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
 def load_image_preserve_orientation(file):
     """Load image and preserve original orientation without auto-rotation"""
     img = Image.open(file)
@@ -374,10 +389,22 @@ def get_elf_verdict(images):
 # --- MAIN UI ---
 
 # 1. Custom Header Block
-st.markdown("""
+logo_html = ""
+try:
+    # Try to load the logo.png file
+    if os.path.exists("assets/logo.png"):
+        logo_base64 = get_base64_of_bin_file("assets/logo.png")
+        logo_html = f'<img src="data:image/png;base64,{logo_base64}" class="header-logo-img" alt="Sleigh or Nay?">'
+    else:
+        # Fallback to text if file missing
+        logo_html = '<div class="logo-text">Sleigh or Nay?</div>'
+except Exception as e:
+    logo_html = '<div class="logo-text">Sleigh or Nay?</div>'
+
+st.markdown(f"""
 <div class="header-container">
     <div class="header-logo-wrapper">
-        <div class="logo-text">Sleigh or Nay?</div>
+        {logo_html}
     </div>
     <div class="powered-by">Powered by ELF-GPT 1.0 🧝</div>
 </div>
