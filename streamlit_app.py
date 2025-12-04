@@ -304,21 +304,16 @@ def get_elf_verdict(images):
         return None
 
 def loading_animation():
+    """Quick loading indicator - actual processing happens during API call"""
     placeholders = [
         "Consulting the High Council of Elves...",
         "Judging your tinsel placement...",
         "Elf-GPT is analyzing sparkle density...",
         "Checking the Naughty List..."
     ]
-    bar = st.progress(0)
     status = st.empty()
-    for i in range(100):
-        if i % 25 == 0:
-            status.markdown(f"**{random.choice(placeholders)}**")
-        bar.progress(i + 1)
-        time.sleep(0.02)
-    bar.empty()
-    status.empty()
+    status.markdown(f"**{random.choice(placeholders)}**")
+    return status  # Return so we can clear it later
 
 # --- MAIN UI ---
 
@@ -339,33 +334,51 @@ if st.session_state.result is None:
     
     st.markdown('<div class="intro-text">Santa is jumping on the AI bandwagon and outsourcing.</div>', unsafe_allow_html=True)
     
+    # Add camera input option
+    camera_photo = st.camera_input("📸 Take a Photo", help="Snap a pic of your Christmas spirit!")
+    
     uploaded_files = st.file_uploader(
-        "📸 Upload Photo Evidence (Room, Tree, You...)", 
+        "📁 Or Upload Photos (Room, Tree, You...)", 
         type=['png', 'jpg', 'jpeg'], 
         accept_multiple_files=True,
         help="Upload up to 5 photos of your Christmas spirit!"
     )
 
+    # Combine camera photo with uploaded files
+    all_files = []
+    if camera_photo:
+        all_files.append(camera_photo)
     if uploaded_files:
+        all_files.extend(uploaded_files)
+
+    if all_files:
         # Show thumbnails
-        cols = st.columns(min(len(uploaded_files), 3))
-        for idx, file in enumerate(uploaded_files[:3]):
+        cols = st.columns(min(len(all_files), 3))
+        for idx, file in enumerate(all_files[:3]):
             with cols[idx % 3]:
                 img = Image.open(file)
                 st.image(img, use_container_width=True)
         
-        if len(uploaded_files) > 3:
-            st.caption(f"+ {len(uploaded_files) - 3} more photo(s)")
+        if len(all_files) > 3:
+            st.caption(f"+ {len(all_files) - 3} more photo(s)")
         
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("SUBMIT"):
-            if len(uploaded_files) > 5:
+            if len(all_files) > 5:
                 st.warning("⚠️ Limit 5 photos! The elves can only process so much...")
             else:
-                pil_images = [Image.open(f) for f in uploaded_files]
+                pil_images = [Image.open(f) for f in all_files]
                 st.session_state.images = pil_images
-                loading_animation()
+                
+                # Show loading message
+                status = loading_animation()
+                
+                # Actually call the API (this is where the real time is spent)
                 result = get_elf_verdict(pil_images)
+                
+                # Clear loading message
+                status.empty()
+                
                 if result:
                     st.session_state.result = result
                     st.rerun()
