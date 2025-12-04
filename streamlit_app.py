@@ -29,19 +29,23 @@ st.markdown("""
         max-width: 500px;
         margin: 0 auto;
         overflow-x: hidden;
+        text-align: center;
+    }
+    
+    /* Center all text elements */
+    .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp label, .stApp div {
+        text-align: center;
     }
 
     /* 1. Custom Red Header Bar - Fixed for mobile */
     .header-container {
         background-color: #C93A3C;
         padding: 25px 15px;
-        margin-top: -80px;
+        margin-top: -100px;
         margin-left: calc(-50vw + 50%);
         margin-right: calc(-50vw + 50%);
         width: 100vw;
         max-width: 100vw;
-        border-bottom-left-radius: 25px;
-        border-bottom-right-radius: 25px;
         text-align: center;
         box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         margin-bottom: 20px;
@@ -182,18 +186,20 @@ st.markdown("""
 
     /* 4. Gold Frame Video */
     .gold-frame {
-        border: 10px solid #D4AF37;
+        border: 8px solid #D4AF37;
         border-radius: 15px;
         background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
         padding: 0;
-        margin: 30px 20px;
+        margin: 30px 15px;
         box-shadow: 
             0 8px 20px rgba(0,0,0,0.4),
             inset 0 0 30px rgba(0,0,0,0.6),
             0 0 0 2px #B8941E,
-            0 0 0 12px #D4AF37;
+            0 0 0 10px #D4AF37;
         position: relative;
         overflow: hidden;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .gold-frame img {
@@ -205,18 +211,18 @@ st.markdown("""
     /* 5. Result Typography */
     .verdict-title {
         font-family: 'Mountains of Christmas', cursive;
-        font-size: 2.5rem;
+        font-size: clamp(2rem, 6vw, 2.5rem);
         text-align: center;
         line-height: 1.2;
         margin: 20px 0 15px 0;
-        padding: 0 20px;
+        padding: 0 15px;
     }
     
     .elf-feedback-section {
         background: #f8f8f8;
         border-radius: 15px;
-        padding: 20px;
-        margin: 20px;
+        padding: 20px 15px;
+        margin: 20px 15px;
     }
     
     .elf-image-container {
@@ -227,11 +233,12 @@ st.markdown("""
     .elf-image-container img {
         width: 150px;
         height: auto;
+        max-width: 100%;
     }
     
     .feedback-text {
         font-family: 'Roboto', sans-serif;
-        font-size: 0.95rem;
+        font-size: clamp(0.85rem, 2.5vw, 0.95rem);
         line-height: 1.6;
         color: #222 !important;
         text-align: center;
@@ -239,15 +246,15 @@ st.markdown("""
     
     .score-display {
         font-family: 'Mountains of Christmas', cursive;
-        font-size: 2rem;
+        font-size: clamp(1.5rem, 5vw, 2rem);
         text-align: center;
         margin: 15px 0;
         font-weight: bold;
     }
     
     .santa-comment-box {
-        margin: 20px;
-        padding: 20px;
+        margin: 20px 15px;
+        padding: 20px 15px;
         background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
         border-radius: 15px;
         border: 2px solid #ddd;
@@ -255,14 +262,14 @@ st.markdown("""
     
     .santa-comment-box strong {
         font-family: 'Mountains of Christmas', cursive;
-        font-size: 1.3rem;
+        font-size: clamp(1.1rem, 4vw, 1.3rem);
         color: #C93A3C !important;
     }
     
     .santa-comment-box em {
         font-family: 'Roboto', sans-serif;
         color: #333 !important;
-        font-size: 0.95rem;
+        font-size: clamp(0.85rem, 2.5vw, 0.95rem);
         line-height: 1.5;
         font-style: normal;
         display: block;
@@ -472,13 +479,6 @@ if st.session_state.result is None:
                     # Clear rotations when submitting
                     st.session_state.rotation_angles = {}
                     st.rerun()
-    
-    st.markdown("""
-    <div class="small-text">
-        Manual judgment is unscalable. I replaced 4,000 elves with this AI. 
-        Upload your data for immediate Q4 processing.
-    </div>
-    """, unsafe_allow_html=True)
 
     # Video Frame with image
     st.markdown('<div class="gold-frame">', unsafe_allow_html=True)
@@ -487,7 +487,7 @@ if st.session_state.result is None:
         <div style="position: relative; padding-top: 56.25%;">
             <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
                         display: flex; align-items: center; justify-content: center;
-                        font-family: 'Mountains of Christmas', cursive; font-size: 1.3rem; color: white;">
+                        font-family: 'Mountains of Christmas', cursive; font-size: 1.3rem; color: #5FBA47;">
                 🎅<br>A MESSAGE FROM<br>THE NORTH POLE
             </div>
         </div>
