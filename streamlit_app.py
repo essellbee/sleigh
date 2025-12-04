@@ -499,11 +499,12 @@ if st.session_state.result is None:
     
     # File uploader
     uploaded_files = st.file_uploader(
-        "📁 Or upload photos from your device", 
+        "", 
         type=['png', 'jpg', 'jpeg'], 
         accept_multiple_files=True,
         key="file_uploader",
-        help="Upload up to 5 photos"
+        help="Upload up to 5 photos",
+        label_visibility="collapsed"
     )
 
     # Combine camera photo with uploaded files
