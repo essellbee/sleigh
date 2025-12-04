@@ -545,10 +545,7 @@ if st.session_state.result is None:
             col1, col2 = st.columns([4, 1])
             with col1:
                 st.image(img, use_container_width=True)
-            with col2:
-                if st.button("🔄", key=f"rotate_{file_key}_{idx}", help="Rotate 90° counterclockwise"):
-                    st.session_state.rotation_angles[file_key] = (st.session_state.rotation_angles[file_key] - 90) % 360
-                    st.rerun()
+            # Rotation button removed
         
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("SUBMIT", use_container_width=True):
