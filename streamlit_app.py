@@ -73,9 +73,9 @@ st.markdown("""
         align-items: center;
         justify-content: space-between; 
         gap: 10px;
-        padding: 0 15%; /* Increased padding significantly to move images inwards */
+        padding: 0 20px; /* Standard padding to align items to the left and right edges */
         width: 100%;
-        max-width: 700px; /* Constrain width on desktop */
+        max-width: 100%; /* Allow full width so items go to the edges */
         margin: 0 auto;
         box-sizing: border-box;
     }
