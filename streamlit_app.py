@@ -854,7 +854,7 @@ else:
             st.download_button(
                 label="🛠️ TEST: Download Filled Certificate PDF",
                 data=test_pdf_bytes,
-                file_name="Santa_Certificate_TEST.pdf",
+                file_name=f"Santa_Certificate_{'Nice' if is_sleigh_test else 'Naughty'}.pdf",
                 mime="application/pdf",
                 use_container_width=True
             )
