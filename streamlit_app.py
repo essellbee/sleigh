@@ -41,16 +41,22 @@ st.markdown("""
     .header-container {
         background-color: #C93A3C;
         padding: 25px 15px;
-        margin-top: -100px;
-        margin-left: calc(-50vw + 50%);
-        margin-right: calc(-50vw + 50%);
+        margin-top: -60px;
+        
+        /* Breakout Logic */
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
         width: 100vw;
         max-width: 100vw;
+        
         text-align: center;
         box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         margin-bottom: 20px;
-        position: relative;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .header-logo-wrapper {
