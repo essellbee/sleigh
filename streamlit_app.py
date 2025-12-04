@@ -765,6 +765,16 @@ else:
                 </div>
                 """, unsafe_allow_html=True)
 
+    # --- DISPLAY SUBMITTED PHOTOS ---
+    if st.session_state.images:
+        st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
+        # Create columns based on number of images
+        cols = st.columns(len(st.session_state.images))
+        for idx, col in enumerate(cols):
+            with col:
+                # Add a subtle border/shadow to make them pop against the white background
+                st.image(st.session_state.images[idx], use_container_width=True)
+
     # 2. Feedback Section (all content below)
     # Combine content into one markdown block to prevent empty container artifact ("grey bar")
     feedback_content = f"""
