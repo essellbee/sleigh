@@ -609,32 +609,6 @@ if st.session_state.result is None:
                     # Clear rotations when submitting
                     st.session_state.rotation_angles = {}
                     st.rerun()
-    
-    st.markdown("""
-    <div class="small-text">
-        Manual judgment is unscalable. I replaced 4,000 elves with this AI. 
-        Upload your data for immediate Q4 processing.
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Video Frame with image
-    st.markdown('<div class="gold-frame">', unsafe_allow_html=True)
-    
-    # Using the Santa image you provided
-    # You'll need to save image 2 as "santa_frame.png" in your Streamlit directory
-    # For now, showing placeholder
-    st.markdown("""
-        <div style="position: relative; padding-top: 56.25%;">
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-                        display: flex; align-items: center; justify-content: center;
-                        font-family: 'Mountains of Christmas', cursive; font-size: 1.3rem; color: white;">
-                🎅<br>A MESSAGE FROM<br>THE NORTH POLE
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-
 else:
     # --- SCREEN 2: RESULTS ---
     
