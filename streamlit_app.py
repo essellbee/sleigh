@@ -550,10 +550,11 @@ if st.session_state.result is None:
         
         for idx, file in enumerate(all_files):
             # Generate unique key for this file
-            if file == camera_photo:
+            if camera_photo and file == camera_photo:
                 file_key = "camera_photo"
             else:
-                file_key = f"upload_{file.name}_{idx}"
+                # Use index for unique key since file.name might not exist for camera
+                file_key = f"upload_{idx}"
             
             # Initialize rotation angle if not exists
             if file_key not in st.session_state.rotation_angles:
@@ -571,7 +572,7 @@ if st.session_state.result is None:
             with col1:
                 st.image(img, use_container_width=True)
             with col2:
-                if st.button("🔄", key=f"rotate_{file_key}", help="Rotate 90° counterclockwise"):
+                if st.button("🔄", key=f"rotate_{file_key}_{idx}", help="Rotate 90° counterclockwise"):
                     st.session_state.rotation_angles[file_key] = (st.session_state.rotation_angles[file_key] - 90) % 360
                     st.rerun()
         
@@ -583,10 +584,10 @@ if st.session_state.result is None:
                 # Load images with applied rotations
                 pil_images = []
                 for idx, file in enumerate(all_files):
-                    if file == camera_photo:
+                    if camera_photo and file == camera_photo:
                         file_key = "camera_photo"
                     else:
-                        file_key = f"upload_{file.name}_{idx}"
+                        file_key = f"upload_{idx}"
                     
                     img = load_image_preserve_orientation(file)
                     
