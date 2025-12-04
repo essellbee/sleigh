@@ -6,6 +6,7 @@ import random
 import json
 import base64
 import os
+import threading
 
 # --- APP CONFIGURATION ---
 st.set_page_config(
@@ -413,7 +414,8 @@ def get_elf_verdict(images):
         text = response.text.replace('```json', '').replace('```', '')
         return json.loads(text)
     except Exception as e:
-        st.error(f"Elf-GPT crashed: {e}")
+        # Avoid st.error here as it might break in threads; just return None
+        print(f"Elf-GPT crashed: {e}") 
         return None
 
 # --- MAIN UI ---
@@ -538,17 +540,56 @@ if st.session_state.result is None:
                 
                 st.session_state.images = pil_images
                 
-                # Show custom progress bar
-                progress_placeholder = st.empty()
-                progress_placeholder.markdown("""
-                    <div class="progress-container">
-                      <div class="progress-bar"></div>
-                    </div>
-                    <p style="text-align: center; font-style: italic; color: #666;">🎄 Elf-GPT is checking the list twice...</p>
-                """, unsafe_allow_html=True)
+                # --- THREADED API CALL WITH ANIMATED TEXT ---
                 
-                # Actually call the API (this is where the real time is spent)
-                result = get_elf_verdict(pil_images)
+                progress_placeholder = st.empty()
+                
+                # Fun loading messages to cycle through
+                loading_texts = [
+                    "🎄 Elf-GPT is checking the list twice...",
+                    "☕ Sipping hot cocoa to stay warm...",
+                    "🦌 Asking Rudolph for a second opinion...",
+                    "📏 Measuring your holiday cheer coefficient...",
+                    "💡 Untangling the Christmas tree lights...",
+                    "🥕 Feeding carrots to the reindeer...",
+                    "❄️ analyzing snow composition...",
+                    "🧝‍♂️ Consulting the High Council of Elves...",
+                    "🍪 Quality testing Santa's cookies...",
+                    "📜 Scanning the Naughty & Nice database..."
+                ]
+                
+                # Container to store result from thread
+                result_container = {"data": None}
+                
+                def run_api_call():
+                    result_container['data'] = get_elf_verdict(pil_images)
+
+                # Start API thread
+                api_thread = threading.Thread(target=run_api_call)
+                api_thread.start()
+
+                # Animation loop while waiting
+                msg_index = 0
+                while api_thread.is_alive():
+                    # Pick a message (cycle or random)
+                    current_text = loading_texts[msg_index % len(loading_texts)]
+                    
+                    progress_placeholder.markdown(f"""
+                        <div class="progress-container">
+                          <div class="progress-bar"></div>
+                        </div>
+                        <p style="text-align: center; font-style: italic; color: #666; margin-top: 10px;">
+                            {current_text}
+                        </p>
+                    """, unsafe_allow_html=True)
+                    
+                    # Wait a bit before next update
+                    time.sleep(2)
+                    msg_index = random.randint(0, len(loading_texts) - 1)
+
+                # Thread finished
+                api_thread.join()
+                result = result_container['data']
                 
                 # Clear progress bar
                 progress_placeholder.empty()
