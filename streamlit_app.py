@@ -483,15 +483,19 @@ if st.session_state.result is None:
     # Video Frame with image
     st.markdown('<div class="gold-frame">', unsafe_allow_html=True)
     
-    st.markdown("""
-        <div style="position: relative; padding-top: 56.25%;">
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-                        display: flex; align-items: center; justify-content: center;
-                        font-family: 'Mountains of Christmas', cursive; font-size: 1.3rem; color: #5FBA47;">
-                🎅<br>A MESSAGE FROM<br>THE NORTH POLE
+    # Try to load the Santa frame image, fallback to text if not found
+    try:
+        st.image("assets/santa_frame.png", use_container_width=True)
+    except:
+        st.markdown("""
+            <div style="position: relative; padding-top: 56.25%;">
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+                            display: flex; align-items: center; justify-content: center;
+                            font-family: 'Mountains of Christmas', cursive; font-size: 1.3rem; color: #5FBA47;">
+                    🎅<br>A MESSAGE FROM<br>THE NORTH POLE
+                </div>
             </div>
-        </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -505,26 +509,45 @@ else:
     is_sleigh = score >= 7
     title_color = "#C93A3C" if is_sleigh else "#5FBA47"  # Red for sleigh, green for nay
     
-    # Determine which elf image to use
-    elf_emoji = "🧝‍♂️😊" if is_sleigh else "🧝‍♂️👎"
-
-    # 1. The Verdict Title
-    verdict_title = data.get("verdict_title", "THE VERDICT")
-    st.markdown(f"""
-    <div class="verdict-title" style="color: {title_color};">
-        {verdict_title}
-    </div>
-    """, unsafe_allow_html=True)
+    # Show verdict title image
+    if is_sleigh:
+        try:
+            st.image("assets/sleigh_title.png", use_container_width=True)
+        except:
+            verdict_title = data.get("verdict_title", "IT'S A TOTAL SLEIGH!")
+            st.markdown(f"""
+            <div class="verdict-title" style="color: {title_color};">
+                {verdict_title}
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        try:
+            st.image("assets/nay_title.png", use_container_width=True)
+        except:
+            verdict_title = data.get("verdict_title", "BAH HUMBUG... SO NAY.")
+            st.markdown(f"""
+            <div class="verdict-title" style="color: {title_color};">
+                {verdict_title}
+            </div>
+            """, unsafe_allow_html=True)
 
     # 2. Elf Feedback Section
     st.markdown('<div class="elf-feedback-section">', unsafe_allow_html=True)
     
-    # Elf Image (centered)
-    st.markdown(f"""
-    <div class="elf-image-container">
-        <div style='font-size:6rem;'>{elf_emoji}</div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Elf Image (centered) - use actual images
+    try:
+        if is_sleigh:
+            st.image("assets/happy_elf.png", width=200)
+        else:
+            st.image("assets/grumpy_elf.png", width=200)
+    except:
+        # Fallback to emoji if images not found
+        elf_emoji = "🧝‍♂️😊" if is_sleigh else "🧝‍♂️👎"
+        st.markdown(f"""
+        <div class="elf-image-container">
+            <div style='font-size:6rem;'>{elf_emoji}</div>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Feedback text
     st.markdown(f"""
