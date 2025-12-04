@@ -260,6 +260,10 @@ if 'result' not in st.session_state:
     st.session_state.result = None
 if 'images' not in st.session_state:
     st.session_state.images = None
+if 'show_camera' not in st.session_state:
+    st.session_state.show_camera = False
+if 'camera_photo' not in st.session_state:
+    st.session_state.camera_photo = None
 
 # --- SIDEBAR (API KEY) ---
 with st.sidebar:
@@ -281,14 +285,17 @@ def get_elf_verdict(images):
     model = genai.GenerativeModel('gemini-2.5-flash-preview-09-2025')
 
     prompt = """
-    You are ELF-GPT 1.0, a sarcastic, trendy, and slightly judgmental Christmas Elf. 
+    You are ELF-GPT 1.0, a sarcastic, trendy, and slightly judgmental Christmas Elf who's extremely online and fluent in both Gen-Z and Millennial culture. 
     Analyze these photo(s) for "Christmas Spirit". 
     
     Your Output must be valid JSON with the following keys:
     - "verdict_title": A short punchy title (e.g., "It's a Total SLEIGH!" or "Bah Humbug... So NAY.")
     - "score": A number between 1 and 10.
-    - "roast_content": A paragraph of feedback. If the score is high (7-10), give high praise with Gen-Z slang. If the score is low (1-6), roast them playfully about their lack of effort, sad decorations, or awkward posing. Be funny, specific to the image details.
-    - "santa_comment": A one-liner from Santa.
+    - "roast_content": A paragraph of feedback mixing Gen-Z and Millennial slang. 
+      * If the score is high (7-10): Give high praise using terms like "slay", "no cap", "bussin", "it's giving Christmas vibes", "main character energy", "living your best life", "goals AF", "chef's kiss", "periodt", "understood the assignment"
+      * If the score is low (1-6): Roast them playfully using terms like "mid", "L", "not it", "big yikes", "cringe", "giving Grinch energy", "that's a no from me dawg", "oof", "this ain't it chief", "low-key embarrassing", "the bare minimum", "Netflix and no chill vibes"
+      Be funny, specific to the image details, and mix both generational slang naturally. Don't force it - let it flow conversationally.
+    - "santa_comment": A one-liner from Santa using either wholesome millennial phrases ("You're doing amazing, sweetie") or Gen-Z humor ("Bestie... we need to talk")
     """
 
     try:
@@ -334,8 +341,31 @@ if st.session_state.result is None:
     
     st.markdown('<div class="intro-text">Santa is jumping on the AI bandwagon and outsourcing.</div>', unsafe_allow_html=True)
     
-    # Add camera input option
-    camera_photo = st.camera_input("📸 Take a Photo", help="Snap a pic of your Christmas spirit!")
+    # Camera button toggle
+    col1, col2 = st.columns(2)
+    with col1:
+        if not st.session_state.show_camera and not st.session_state.camera_photo:
+            if st.button("📸 Take a Photo"):
+                st.session_state.show_camera = True
+                st.rerun()
+        elif st.session_state.camera_photo:
+            if st.button("📸 Take Another Photo"):
+                st.session_state.camera_photo = None
+                st.session_state.show_camera = True
+                st.rerun()
+    
+    # Show camera input only when toggled
+    if st.session_state.show_camera:
+        camera_photo = st.camera_input("Snap your Christmas spirit!", key="camera")
+        if camera_photo:
+            st.session_state.camera_photo = camera_photo
+            st.session_state.show_camera = False
+            st.rerun()
+    
+    # Show captured photo thumbnail
+    if st.session_state.camera_photo:
+        st.success("✅ Photo captured!")
+        st.image(Image.open(st.session_state.camera_photo), caption="Your photo", width=200)
     
     uploaded_files = st.file_uploader(
         "📁 Or Upload Photos (Room, Tree, You...)", 
@@ -346,13 +376,14 @@ if st.session_state.result is None:
 
     # Combine camera photo with uploaded files
     all_files = []
-    if camera_photo:
-        all_files.append(camera_photo)
+    if st.session_state.camera_photo:
+        all_files.append(st.session_state.camera_photo)
     if uploaded_files:
         all_files.extend(uploaded_files)
 
     if all_files:
         # Show thumbnails
+        st.markdown("### Your Photos:")
         cols = st.columns(min(len(all_files), 3))
         for idx, file in enumerate(all_files[:3]):
             with cols[idx % 3]:
@@ -377,6 +408,9 @@ if st.session_state.result is None:
                 
                 if result:
                     st.session_state.result = result
+                    # Clear camera state when submitting
+                    st.session_state.camera_photo = None
+                    st.session_state.show_camera = False
                     st.rerun()
     
     st.markdown("""
@@ -478,4 +512,6 @@ else:
     if st.button("START OVER"):
         st.session_state.result = None
         st.session_state.images = None
+        st.session_state.camera_photo = None
+        st.session_state.show_camera = False
         st.rerun()
