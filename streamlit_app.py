@@ -1,6 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
-from PIL import Image
+from PIL import Image, ImageOps
 import time
 import random
 import json
@@ -264,6 +264,8 @@ if 'show_camera' not in st.session_state:
     st.session_state.show_camera = False
 if 'camera_photo' not in st.session_state:
     st.session_state.camera_photo = None
+if 'rotation_angles' not in st.session_state:
+    st.session_state.rotation_angles = {}
 
 # --- SIDEBAR (API KEY) ---
 with st.sidebar:
@@ -310,17 +312,15 @@ def get_elf_verdict(images):
         st.error(f"Elf-GPT crashed: {e}")
         return None
 
-def loading_animation():
-    """Quick loading indicator - actual processing happens during API call"""
-    placeholders = [
-        "Consulting the High Council of Elves...",
-        "Judging your tinsel placement...",
-        "Elf-GPT is analyzing sparkle density...",
-        "Checking the Naughty List..."
-    ]
-    status = st.empty()
-    status.markdown(f"**{random.choice(placeholders)}**")
-    return status  # Return so we can clear it later
+def load_image_preserve_orientation(file):
+    """Load image and preserve original orientation without auto-rotation"""
+    img = Image.open(file)
+    # Don't apply EXIF orientation - keep as-is
+    return img
+
+def rotate_image(img, angle):
+    """Rotate image by specified angle"""
+    return img.rotate(angle, expand=True)
 
 # --- MAIN UI ---
 
@@ -365,7 +365,24 @@ if st.session_state.result is None:
     # Show captured photo thumbnail
     if st.session_state.camera_photo:
         st.success("✅ Photo captured!")
-        st.image(Image.open(st.session_state.camera_photo), caption="Your photo", width=200)
+        camera_img = load_image_preserve_orientation(st.session_state.camera_photo)
+        
+        # Get rotation angle for camera photo
+        camera_key = "camera_photo"
+        if camera_key not in st.session_state.rotation_angles:
+            st.session_state.rotation_angles[camera_key] = 0
+        
+        # Apply rotation if any
+        if st.session_state.rotation_angles[camera_key] != 0:
+            camera_img = rotate_image(camera_img, st.session_state.rotation_angles[camera_key])
+        
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.image(camera_img, caption="Your photo", width=200)
+        with col2:
+            if st.button("🔄", key="rotate_camera", help="Rotate photo 90°"):
+                st.session_state.rotation_angles[camera_key] = (st.session_state.rotation_angles[camera_key] - 90) % 360
+                st.rerun()
     
     uploaded_files = st.file_uploader(
         "📁 Or Upload Photos (Room, Tree, You...)", 
@@ -382,13 +399,35 @@ if st.session_state.result is None:
         all_files.extend(uploaded_files)
 
     if all_files:
-        # Show thumbnails
+        # Show thumbnails with rotation controls
         st.markdown("### Your Photos:")
         cols = st.columns(min(len(all_files), 3))
-        for idx, file in enumerate(all_files[:3]):
+        
+        for idx, file in enumerate(all_files):
             with cols[idx % 3]:
-                img = Image.open(file)
+                # Generate unique key for this file
+                if file == st.session_state.camera_photo:
+                    file_key = "camera_photo"
+                else:
+                    file_key = f"upload_{file.name}_{idx}"
+                
+                # Initialize rotation angle if not exists
+                if file_key not in st.session_state.rotation_angles:
+                    st.session_state.rotation_angles[file_key] = 0
+                
+                # Load and display image
+                img = load_image_preserve_orientation(file)
+                
+                # Apply rotation if any
+                if st.session_state.rotation_angles[file_key] != 0:
+                    img = rotate_image(img, st.session_state.rotation_angles[file_key])
+                
                 st.image(img, use_container_width=True)
+                
+                # Rotation button
+                if st.button("🔄 Rotate", key=f"rotate_{file_key}", help="Rotate 90° counterclockwise"):
+                    st.session_state.rotation_angles[file_key] = (st.session_state.rotation_angles[file_key] - 90) % 360
+                    st.rerun()
         
         if len(all_files) > 3:
             st.caption(f"+ {len(all_files) - 3} more photo(s)")
@@ -398,7 +437,22 @@ if st.session_state.result is None:
             if len(all_files) > 5:
                 st.warning("⚠️ Limit 5 photos! The elves can only process so much...")
             else:
-                pil_images = [Image.open(f) for f in all_files]
+                # Load images with applied rotations
+                pil_images = []
+                for idx, file in enumerate(all_files):
+                    if file == st.session_state.camera_photo:
+                        file_key = "camera_photo"
+                    else:
+                        file_key = f"upload_{file.name}_{idx}"
+                    
+                    img = load_image_preserve_orientation(file)
+                    
+                    # Apply rotation if any
+                    if file_key in st.session_state.rotation_angles and st.session_state.rotation_angles[file_key] != 0:
+                        img = rotate_image(img, st.session_state.rotation_angles[file_key])
+                    
+                    pil_images.append(img)
+                
                 st.session_state.images = pil_images
                 
                 # Show spinner while processing
@@ -408,9 +462,10 @@ if st.session_state.result is None:
                 
                 if result:
                     st.session_state.result = result
-                    # Clear camera state when submitting
+                    # Clear camera state and rotations when submitting
                     st.session_state.camera_photo = None
                     st.session_state.show_camera = False
+                    st.session_state.rotation_angles = {}
                     st.rerun()
     
     st.markdown("""
@@ -514,4 +569,5 @@ else:
         st.session_state.images = None
         st.session_state.camera_photo = None
         st.session_state.show_camera = False
+        st.session_state.rotation_angles = {}
         st.rerun()
