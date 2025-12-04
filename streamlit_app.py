@@ -90,20 +90,22 @@ st.markdown("""
     }
 
     .header-logo-img {
-        max-height: 70px; /* Slightly smaller to fit better */
+        max-height: 60px; /* Reduced height */
         width: auto;
-        max-width: 55%; /* Ensure it leaves room for the elf */
+        max-width: 50%; /* Reduced max-width */
         filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         object-fit: contain;
+        flex-shrink: 1; /* Allow to shrink if needed */
     }
     
     .header-elf-img {
-        max-height: 70px; /* Match logo height constraints */
+        max-height: 60px; /* Reduced height */
         width: auto;
-        max-width: 35%; /* Ensure it fits next to logo */
+        max-width: 30%; /* Reduced max-width */
         filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         object-fit: contain;
-        transform: rotate(5deg); 
+        /* Removed rotation */
+        flex-shrink: 1; /* Allow to shrink if needed */
     }
     
     .powered-by {
@@ -179,6 +181,7 @@ st.markdown("""
     /* Improve caption visibility */
     .stApp p, .stApp caption, .stApp small {
         color: #555 !important;
+        text-align: center;
     }
     
     /* Success messages */
@@ -221,7 +224,31 @@ st.markdown("""
         background: linear-gradient(180deg, #C0C0C0 0%, #A0A0A0 100%);
     }
 
-    /* 4. Result Typography */
+    /* 4. Gold Frame Video */
+    .gold-frame {
+        border: 8px solid #D4AF37;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+        padding: 0;
+        margin: 30px 15px;
+        box-shadow: 
+            0 8px 20px rgba(0,0,0,0.4),
+            inset 0 0 30px rgba(0,0,0,0.6),
+            0 0 0 2px #B8941E,
+            0 0 0 10px #D4AF37;
+        position: relative;
+        overflow: hidden;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .gold-frame img {
+        width: 100%;
+        display: block;
+        border-radius: 5px;
+    }
+
+    /* 5. Result Typography */
     .verdict-title {
         font-family: 'Mountains of Christmas', cursive;
         font-size: clamp(2rem, 6vw, 2.5rem);
