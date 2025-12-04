@@ -73,7 +73,7 @@ st.markdown("""
         align-items: center;
         justify-content: space-between; 
         gap: 10px;
-        padding: 0 5%; /* Percentage padding keeps it safe on mobile */
+        padding: 0 15%; /* Increased padding significantly to move images inwards */
         width: 100%;
         max-width: 700px; /* Constrain width on desktop */
         margin: 0 auto;
