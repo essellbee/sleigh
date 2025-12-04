@@ -49,7 +49,7 @@ st.markdown("""
     /* 1. Custom Red Header Bar - Fixed for mobile */
     .header-container {
         background-color: #C93A3C;
-        padding: 25px 15px;
+        padding: 25px 0; /* Removed horizontal padding here, handled in wrapper */
         margin-top: 0;
         
         /* Breakout Logic */
@@ -71,11 +71,13 @@ st.markdown("""
     .header-logo-wrapper {
         display: flex;
         align-items: center;
-        justify-content: space-between; /* Changed to space-between for left/right layout */
-        gap: 15px;
-        padding: 0 20px; /* Added padding for edges */
-        max-width: 800px; /* prevent it from getting too wide on desktop */
+        justify-content: space-between; 
+        gap: 10px;
+        padding: 0 5%; /* Percentage padding keeps it safe on mobile */
+        width: 100%;
+        max-width: 700px; /* Constrain width on desktop */
         margin: 0 auto;
+        box-sizing: border-box;
     }
     
     .logo-text {
@@ -88,20 +90,20 @@ st.markdown("""
     }
 
     .header-logo-img {
-        max-height: 80px;
+        max-height: 70px; /* Slightly smaller to fit better */
         width: auto;
-        max-width: 60%; /* Limit width to share space */
+        max-width: 55%; /* Ensure it leaves room for the elf */
         filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         object-fit: contain;
     }
     
     .header-elf-img {
-        max-height: 80px;
+        max-height: 70px; /* Match logo height constraints */
         width: auto;
-        max-width: 30%;
+        max-width: 35%; /* Ensure it fits next to logo */
         filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         object-fit: contain;
-        transform: rotate(5deg); /* Jaunty angle for the elf */
+        transform: rotate(5deg); 
     }
     
     .powered-by {
