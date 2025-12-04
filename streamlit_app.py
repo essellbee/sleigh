@@ -31,6 +31,12 @@ st.markdown("""
         overflow-x: hidden;
         text-align: center;
     }
+
+    /* Remove default top padding */
+    .block-container {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
     
     /* Center all text elements */
     .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp label, .stApp div {
@@ -41,7 +47,7 @@ st.markdown("""
     .header-container {
         background-color: #C93A3C;
         padding: 25px 15px;
-        margin-top: -60px;
+        margin-top: 0;
         
         /* Breakout Logic */
         position: relative;
