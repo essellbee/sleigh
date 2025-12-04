@@ -8,7 +8,7 @@ try:
 except ImportError:
     pypdf_available = False
 
-def create_certificate_pdf(verdict, score, comment, template_path="assets/certificate_nice.pdf"):
+def create_certificate_pdf(name, verdict, score, comment, template_path):
     """
     Generates a filled PDF certificate by overlaying text onto a base PDF.
     """
@@ -36,10 +36,11 @@ def create_certificate_pdf(verdict, score, comment, template_path="assets/certif
     clean_comment = comment.replace('\n', ' ')[:80] + "..." if len(comment) > 80 else comment
     c.drawCentredString(396, 350, f'"{clean_comment}"')
 
-    # 4. The requested specific overlay: Name/Signature at (400, 300)
+    # 4. Overlay the Captured Name at specific coordinates
     # Using the specific font and coordinates requested
     c.setFont("Helvetica-Bold", 24)
-    c.drawString(400, 300, "Elf-GPT 1.0") 
+    # Drawing directly at x=400, y=300
+    c.drawString(400, 300, name) 
     
     c.save()
     packet.seek(0)
