@@ -600,11 +600,8 @@ if st.session_state.result is None:
             if st.session_state.rotation_angles[file_key] != 0:
                 img = rotate_image(img, st.session_state.rotation_angles[file_key])
             
-            # Display image and rotation button in columns
-            col1, col2 = st.columns([4, 1])
-            with col1:
-                st.image(img, use_container_width=True)
-            # Rotation button removed
+            # Display image as a smaller thumbnail
+            st.image(img, width=200)
         
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("SUBMIT", use_container_width=True):
