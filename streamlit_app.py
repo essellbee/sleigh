@@ -207,31 +207,7 @@ st.markdown("""
         background: linear-gradient(180deg, #C0C0C0 0%, #A0A0A0 100%);
     }
 
-    /* 4. Gold Frame Video */
-    .gold-frame {
-        border: 8px solid #D4AF37;
-        border-radius: 15px;
-        background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
-        padding: 0;
-        margin: 30px 15px;
-        box-shadow: 
-            0 8px 20px rgba(0,0,0,0.4),
-            inset 0 0 30px rgba(0,0,0,0.6),
-            0 0 0 2px #B8941E,
-            0 0 0 10px #D4AF37;
-        position: relative;
-        overflow: hidden;
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .gold-frame img {
-        width: 100%;
-        display: block;
-        border-radius: 5px;
-    }
-
-    /* 5. Result Typography */
+    /* 4. Result Typography */
     .verdict-title {
         font-family: 'Mountains of Christmas', cursive;
         font-size: clamp(2rem, 6vw, 2.5rem);
@@ -599,25 +575,6 @@ if st.session_state.result is None:
                     # Clear rotations when submitting
                     st.session_state.rotation_angles = {}
                     st.rerun()
-
-    # Video Frame with image
-    st.markdown('<div class="gold-frame">', unsafe_allow_html=True)
-    
-    # Try to load the Santa frame image, fallback to text if not found
-    try:
-        st.image("assets/santa_frame.png", use_container_width=True)
-    except:
-        st.markdown("""
-            <div style="position: relative; padding-top: 56.25%;">
-                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-                            display: flex; align-items: center; justify-content: center;
-                            font-family: 'Mountains of Christmas', cursive; font-size: 1.3rem; color: #5FBA47;">
-                    🎅<br>A MESSAGE FROM<br>THE NORTH POLE
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
 else:
     # --- SCREEN 2: RESULTS ---
