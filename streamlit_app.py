@@ -125,6 +125,47 @@ st.markdown("""
         box-shadow: 0px 3px 0px #357A2B, 0px 4px 8px rgba(0,0,0,0.2);
     }
 
+    /* Camera/Upload buttons in two-column layout */
+    .camera-upload-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .camera-upload-row > div {
+        flex: 1;
+    }
+
+    /* Hide default file uploader and style custom button */
+    [data-testid="stFileUploader"] {
+        display: none;
+    }
+    
+    .custom-file-upload {
+        width: 100%;
+        background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%);
+        color: white;
+        font-family: 'Roboto', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        border-radius: 50px;
+        padding: 18px 20px;
+        border: none;
+        box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2);
+        transition: all 0.15s;
+        letter-spacing: 0.5px;
+        text-align: center;
+        cursor: pointer;
+        display: inline-block;
+    }
+    
+    .custom-file-upload:hover {
+        background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%);
+        transform: translateY(-2px);
+        box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25);
+    }
+
     /* Secondary Button (Grey for Share/Reset) */
     .secondary-btn > div.stButton > button {
         background: linear-gradient(180deg, #B0B0B0 0%, #909090 100%);
@@ -237,14 +278,57 @@ st.markdown("""
     }
 
     /* File uploader styling */
-    [data-testid="stFileUploader"] {
-        padding: 20px;
+    .stFileUploader {
+        padding: 0 !important;
     }
     
-    [data-testid="stFileUploader"] label {
+    .stFileUploader > div {
+        padding: 0 !important;
+    }
+    
+    .stFileUploader label {
         font-family: 'Roboto', sans-serif;
         font-size: 1rem;
         color: #333;
+        display: none !important;
+    }
+    
+    /* Style the drag-drop area */
+    [data-testid="stFileUploadDropzone"] {
+        background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%);
+        border: none !important;
+        border-radius: 50px;
+        padding: 18px 20px;
+        box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2);
+        transition: all 0.15s;
+    }
+    
+    [data-testid="stFileUploadDropzone"]:hover {
+        background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%);
+        transform: translateY(-2px);
+        box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25);
+    }
+    
+    [data-testid="stFileUploadDropzone"] button {
+        color: white !important;
+        font-family: 'Roboto', sans-serif !important;
+        font-size: 1.1rem !important;
+        font-weight: 900 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
+    
+    [data-testid="stFileUploadDropzone"] svg {
+        display: none;
+    }
+    
+    [data-testid="stFileUploadDropzone"] span {
+        color: white !important;
+        font-weight: 900 !important;
+    }
+    
+    [data-testid="stFileUploadDropzone"] small {
+        display: none !important;
     }
 
     /* Hide Streamlit Branding */
@@ -341,26 +425,38 @@ if st.session_state.result is None:
     
     st.markdown('<div class="intro-text">Santa is jumping on the AI bandwagon and outsourcing.</div>', unsafe_allow_html=True)
     
-    # Camera button toggle
+    # Camera and Upload buttons side by side
     col1, col2 = st.columns(2)
+    
     with col1:
         if not st.session_state.show_camera and not st.session_state.camera_photo:
-            if st.button("📸 Take a Photo"):
+            if st.button("📸 TAKE PHOTO", use_container_width=True):
                 st.session_state.show_camera = True
                 st.rerun()
         elif st.session_state.camera_photo:
-            if st.button("📸 Take Another Photo"):
+            if st.button("📸 RETAKE", use_container_width=True):
                 st.session_state.camera_photo = None
                 st.session_state.show_camera = True
                 st.rerun()
     
+    with col2:
+        # This is a placeholder - the actual file uploader will be below
+        if st.button("📁 BROWSE FILES", use_container_width=True, key="browse_trigger"):
+            # This button is just for visual consistency
+            # The actual file uploader below handles the functionality
+            pass
+    
     # Show camera input only when toggled
     if st.session_state.show_camera:
-        camera_photo = st.camera_input("Snap your Christmas spirit!", key="camera")
+        st.markdown("### 📸 Smile for the camera!")
+        camera_photo = st.camera_input("", key="camera", label_visibility="collapsed")
         if camera_photo:
             st.session_state.camera_photo = camera_photo
             st.session_state.show_camera = False
             st.rerun()
+        
+        # Option to grant camera access if blocked
+        st.caption("🔒 Camera blocked? Check your browser settings or refresh the page to grant access.")
     
     # Show captured photo thumbnail
     if st.session_state.camera_photo:
@@ -384,11 +480,13 @@ if st.session_state.result is None:
                 st.session_state.rotation_angles[camera_key] = (st.session_state.rotation_angles[camera_key] - 90) % 360
                 st.rerun()
     
+    # File uploader (styled to match buttons)
     uploaded_files = st.file_uploader(
-        "📁 Or Upload Photos (Room, Tree, You...)", 
+        "📁 Browse for Photos", 
         type=['png', 'jpg', 'jpeg'], 
         accept_multiple_files=True,
-        help="Upload up to 5 photos of your Christmas spirit!"
+        help="Upload up to 5 photos",
+        label_visibility="collapsed"
     )
 
     # Combine camera photo with uploaded files
