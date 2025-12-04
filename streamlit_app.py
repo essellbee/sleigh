@@ -50,7 +50,7 @@ st.markdown("""
     .header-container {
         background-color: #C93A3C;
         padding: 25px 0; /* Removed horizontal padding here, handled in wrapper */
-        margin-top: 0;
+        margin-top: -30px; /* Negative margin to pull header up and remove whitespace */
         
         /* Breakout Logic */
         position: relative;
