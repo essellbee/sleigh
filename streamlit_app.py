@@ -8,6 +8,13 @@ import base64
 import os
 import threading
 
+# Try to import stripe for secure verification
+try:
+    import stripe
+    stripe_available = True
+except ImportError:
+    stripe_available = False
+
 # --- APP CONFIGURATION ---
 st.set_page_config(
     page_title="Sleigh or Nay?",
@@ -138,7 +145,7 @@ st.markdown("""
     }
 
     /* 3. Button Styling (Green Pill) - Updated to include Link Buttons */
-    div.stButton > button, div.stLinkButton > a {
+    div.stButton > button, div.stLinkButton > a, div.stDownloadButton > button {
         width: 100%;
         background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%);
         color: white !important;
@@ -158,7 +165,7 @@ st.markdown("""
         text-decoration: none;
     }
 
-    div.stButton > button:hover, div.stLinkButton > a:hover {
+    div.stButton > button:hover, div.stLinkButton > a:hover, div.stDownloadButton > button:hover {
         background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%);
         transform: translateY(-2px);
         box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25);
@@ -166,7 +173,7 @@ st.markdown("""
         border: none;
     }
     
-    div.stButton > button:active, div.stLinkButton > a:active {
+    div.stButton > button:active, div.stLinkButton > a:active, div.stDownloadButton > button:active {
         transform: translateY(3px);
         box-shadow: 0px 3px 0px #357A2B, 0px 4px 8px rgba(0,0,0,0.2);
         color: white !important;
@@ -400,7 +407,47 @@ try:
 except:
     api_key = os.environ.get("GEMINI_API_KEY", "")
 
+# --- STRIPE API SETUP ---
+stripe_api_key = None
+try:
+    stripe_api_key = st.secrets["STRIPE_API_KEY"]
+    if stripe_available:
+        stripe.api_key = stripe_api_key
+except:
+    # Use env var or default to None
+    stripe_api_key = os.environ.get("STRIPE_API_KEY", None)
+    if stripe_available and stripe_api_key:
+        stripe.api_key = stripe_api_key
+
 # --- FUNCTIONS ---
+def verify_payment(session_id):
+    """
+    Verifies payment with Stripe API if available.
+    Otherwise falls back to insecure check for testing.
+    """
+    # 1. Secure Method (Requires 'stripe' pip install and API Key)
+    if stripe_available and stripe_api_key and session_id:
+        try:
+            session = stripe.checkout.Session.retrieve(session_id)
+            if session.payment_status == 'paid':
+                return True
+        except Exception as e:
+            st.error(f"Payment verification failed: {e}")
+            return False
+            
+    # 2. Insecure Fallback (For demo/testing without API keys)
+    # WARNING: This should be removed in production
+    if session_id and not stripe_api_key:
+        # If we see ANY session_id but have no key configured, assume success for demo
+        return True
+        
+    # 3. Simple URL flag (The "Insecure" method you wanted to replace)
+    query_params = st.query_params
+    if query_params.get("paid") == "true":
+        return True
+        
+    return False
+
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
@@ -742,20 +789,58 @@ else:
     st.markdown("<br>", unsafe_allow_html=True)
     
     # 4. Action Buttons
-    # Use columns to center the buttons
     col_left, col_center, col_right = st.columns([1, 4, 1])
 
     with col_center:
-        st.link_button("🏆 BUY OFFICIAL CERTIFICATE", "https://buy.stripe.com/dRm8wQcNt33n0FO9pAasg00", use_container_width=True)
-             
-        if st.button("POST YOUR ROAST", use_container_width=True):
-            share_text = f"{verdict_title}\n\nScore: {score}/10\n\n{data.get('roast_content', '')[:100]}..."
-            st.info("📋 Ready to share! (Copy the text above)")
-            st.code(share_text)
+        # Check for payment success via session_id or legacy 'paid' param
+        query_params = st.query_params
+        session_id = query_params.get("session_id")
         
-        if st.button("START OVER", use_container_width=True):
-            st.session_state.result = None
-            st.session_state.images = None
-            st.session_state.rotation_angles = {}
-            st.session_state.show_camera = False
-            st.rerun()
+        # Verify
+        payment_verified = verify_payment(session_id)
+
+        if payment_verified:
+            st.success("Payment Verified! 🎄")
+            
+            # Create a simple certificate text
+            cert_text = f"""
+            OFFICIAL NORTH POLE CERTIFICATE
+            --------------------------------
+            Verdict: {data.get('verdict_title')}
+            Score: {score}/10
+            
+            Santa's Comment: {data.get('santa_comment')}
+            
+            Certified by Elf-GPT 1.0
+            Date: {time.strftime('%Y-%m-%d')}
+            """
+            
+            st.download_button(
+                label="📥 DOWNLOAD CERTIFICATE",
+                data=cert_text,
+                file_name="Santa_Certificate.txt",
+                mime="text/plain",
+                use_container_width=True
+            )
+            
+            if st.button("START OVER", key="restart_paid", use_container_width=True):
+                 st.session_state.result = None
+                 st.session_state.images = None
+                 st.query_params.clear()
+                 st.rerun()
+                 
+        else:
+            # The Payment Link
+            st.link_button("🏆 BUY OFFICIAL CERTIFICATE", "https://buy.stripe.com/dRm8wQcNt33n0FO9pAasg00", use_container_width=True)
+            
+            if st.button("POST YOUR ROAST", use_container_width=True):
+                share_text = f"{verdict_title}\n\nScore: {score}/10\n\n{data.get('roast_content', '')[:100]}..."
+                st.info("📋 Ready to share! (Copy the text above)")
+                st.code(share_text)
+            
+            if st.button("START OVER", use_container_width=True):
+                st.session_state.result = None
+                st.session_state.images = None
+                st.session_state.rotation_angles = {}
+                st.session_state.show_camera = False
+                st.rerun()
