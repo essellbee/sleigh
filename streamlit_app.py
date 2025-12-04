@@ -73,10 +73,10 @@ st.markdown("""
         align-items: center;
         justify-content: space-between; 
         gap: 10px;
-        padding: 0 20px; /* Standard safety padding for mobile edges */
+        padding: 0 15%; /* Increased padding significantly to move images inwards */
         width: 100%;
-        max-width: 700px; /* Constrain content width to match app layout */
-        margin: 0 auto; /* Center the wrapper within the full-width red bar */
+        max-width: 700px; /* Constrain width on desktop */
+        margin: 0 auto;
         box-sizing: border-box;
     }
     
@@ -104,6 +104,17 @@ st.markdown("""
         filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         object-fit: contain;
         /* Removed rotation */
+    }
+    
+    .powered-by {
+        color: white;
+        font-family: 'Roboto', sans-serif;
+        font-size: clamp(0.65rem, 2vw, 0.75rem);
+        font-weight: 600;
+        text-transform: uppercase;
+        opacity: 0.95;
+        margin-top: 8px;
+        letter-spacing: 0.5px;
     }
 
     /* 2. Text Styling */
