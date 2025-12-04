@@ -95,7 +95,6 @@ st.markdown("""
         max-width: 50%; /* Reduced max-width */
         filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         object-fit: contain;
-        flex-shrink: 1; /* Allow to shrink if needed */
     }
     
     .header-elf-img {
@@ -105,18 +104,6 @@ st.markdown("""
         filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         object-fit: contain;
         /* Removed rotation */
-        flex-shrink: 1; /* Allow to shrink if needed */
-    }
-    
-    .powered-by {
-        color: white;
-        font-family: 'Roboto', sans-serif;
-        font-size: clamp(0.65rem, 2vw, 0.75rem);
-        font-weight: 600;
-        text-transform: uppercase;
-        opacity: 0.95;
-        margin-top: 8px;
-        letter-spacing: 0.5px;
     }
 
     /* 2. Text Styling */
@@ -464,7 +451,6 @@ st.markdown(f"""
         {logo_html}
         {elf_html}
     </div>
-    <div class="powered-by">Powered by ELF-GPT 1.0 🧝</div>
 </div>
 """, unsafe_allow_html=True)
 
