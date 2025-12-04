@@ -370,14 +370,10 @@ if st.session_state.result is None:
                 pil_images = [Image.open(f) for f in all_files]
                 st.session_state.images = pil_images
                 
-                # Show loading message
-                status = loading_animation()
-                
-                # Actually call the API (this is where the real time is spent)
-                result = get_elf_verdict(pil_images)
-                
-                # Clear loading message
-                status.empty()
+                # Show spinner while processing
+                with st.spinner("🎄 Elf-GPT is analyzing your Christmas spirit... Please wait!"):
+                    # Actually call the API (this is where the real time is spent)
+                    result = get_elf_verdict(pil_images)
                 
                 if result:
                     st.session_state.result = result
