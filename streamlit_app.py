@@ -550,23 +550,18 @@ else:
                 """, unsafe_allow_html=True)
 
     # 2. Feedback Section (all content below)
-    st.markdown('<div class="elf-feedback-section">', unsafe_allow_html=True)
-    
-    # Feedback text
-    st.markdown(f"""
-    <div class="feedback-text">
-        {data.get("roast_content", "The elves are processing your results...")}
+    # Combine content into one markdown block to prevent empty container artifact ("grey bar")
+    feedback_content = f"""
+    <div class="elf-feedback-section">
+        <div class="feedback-text">
+            {data.get("roast_content", "The elves are processing your results...")}
+        </div>
+        <div class="score-display" style="color: {title_color};">
+            Score: {score}/10
+        </div>
     </div>
-    """, unsafe_allow_html=True)
-    
-    # Score
-    st.markdown(f"""
-    <div class="score-display" style="color: {title_color};">
-        Score: {score}/10
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+    """
+    st.markdown(feedback_content, unsafe_allow_html=True)
 
     # 3. Santa Footer
     st.markdown(f"""
