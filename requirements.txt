@@ -1,4 +1,6 @@
 streamlit
 google-generativeai
 Pillow
-pip install reportlab pypdf
+reportlab
+pypdf
+stripe
