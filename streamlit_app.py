@@ -853,12 +853,12 @@ else:
         if test_pdf_bytes:
             # Create dynamic filename for test
             safe_name_test = name_on_cert_test.strip().replace(" ", "_")
-            type_str_test = "Nice" if is_sleigh_test else "Naughty"
+            type_str_test = "nice" if is_sleigh_test else "naughty"
             
             st.download_button(
                 label="🛠️ TEST: Download Filled Certificate PDF",
                 data=test_pdf_bytes,
-                file_name=f"Santa_Certificate_2025_{safe_name_test}.pdf",
+                file_name=f"certificate_{type_str_test}_{safe_name_test}.pdf",
                 mime="application/pdf",
                 use_container_width=True
             )
@@ -885,6 +885,15 @@ else:
                 template_path=template_path
             )
             
+            # Generate the Case File
+            report_bytes = pdf_generator.create_roast_report(
+                name=name_on_cert,
+                verdict=data.get('verdict_title', "Sleigh or Nay?"),
+                score=score,
+                roast_content=data.get('roast_content', "No roast found."),
+                pil_images=st.session_state.images
+            )
+            
             if pdf_bytes:
                 # Create dynamic filename
                 safe_name = name_on_cert.strip().replace(" ", "_")
@@ -893,19 +902,18 @@ else:
                 st.download_button(
                     label="📥 DOWNLOAD CERTIFICATE",
                     data=pdf_bytes,
-                    file_name=f"Santa_Certificate_2025_{safe_name}.pdf",
+                    file_name=f"certificate_{type_str}_{safe_name}.pdf",
                     mime="application/pdf",
                     use_container_width=True
                 )
-            else:
-                st.error("Certificate generation failed (missing template or libraries).")
-                # Fallback to text file if PDF fails
-                cert_text = f"Certificate for: {name_on_cert}\nVerdict: {data.get('verdict_title')}\nScore: {score}/10\n..."
+                
+            if report_bytes:
+                safe_name = name_on_cert.strip().replace(" ", "_")
                 st.download_button(
-                    label="📥 DOWNLOAD TEXT CERTIFICATE",
-                    data=cert_text,
-                    file_name="Santa_Certificate.txt",
-                    mime="text/plain",
+                    label="📥 DOWNLOAD FULL CASE FILE",
+                    data=report_bytes,
+                    file_name=f"case_file_{safe_name}.pdf",
+                    mime="application/pdf",
                     use_container_width=True
                 )
             
