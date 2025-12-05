@@ -1,8 +1,17 @@
-# Use the lightweight Nginx Alpine image
-FROM nginx:alpine
+# Use a lightweight Python version
+FROM python:3.9-slim
 
-# Copy your index.html into the directory where Nginx serves files
-COPY index.html /usr/share/nginx/html/index.html
+# Set the working directory in the container
+WORKDIR /app
 
-# Expose port 80 (Standard for web traffic)
-EXPOSE 80
+# Copy all files from your repo into the container
+COPY . .
+
+# Install the required libraries
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expose the port Streamlit runs on
+EXPOSE 8501
+
+# Run the application (Ensure your main file is named app.py)
+CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
