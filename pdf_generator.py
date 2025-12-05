@@ -111,7 +111,7 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         if pil_images:
             # Force size for 5 across regardless of actual count (thumbnails)
             slots_across = 5
-            gap = 5
+            gap = 0 # Changed from 5 to 0 to remove gaps between images
             
             # Calculate dimension for a single slot in a 5-column grid
             img_w = (usable_width - (gap * (slots_across - 1))) / slots_across
