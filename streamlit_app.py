@@ -405,9 +405,13 @@ st.markdown("""
     footer {display: none;}
     header {display: none;}
     
-    /* Disable Fullscreen on Images */
-    [data-testid="stImage"] img {
+    /* Disable Fullscreen on Images - TARGET CONTAINER */
+    [data-testid="stImage"] {
         pointer-events: none;
+    }
+    /* Force hide fullscreen button just in case */
+    [data-testid="StyledFullScreenButton"] {
+        display: none !important;
     }
     
 </style>
