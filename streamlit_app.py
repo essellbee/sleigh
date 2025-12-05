@@ -159,15 +159,15 @@ st.markdown("""
         background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%);
         color: white !important;
         font-family: 'Roboto', sans-serif;
-        font-size: clamp(0.95rem, 3vw, 1.1rem);
+        font-size: clamp(1.2rem, 4vw, 1.5rem); /* Increased font size */
         font-weight: 900;
         text-transform: uppercase;
         border-radius: 50px;
-        padding: 15px 20px;
+        padding: 18px 25px; /* Increased padding */
         border: none;
         box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2);
         transition: all 0.15s;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
         display: flex;
         justify-content: center;
         align-items: center;
