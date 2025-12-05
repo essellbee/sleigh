@@ -70,9 +70,10 @@ def create_certificate_pdf(name, verdict, score, comment, template_path):
         print(f"Certificate Error: {e}")
         return None
 
-def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_images, template_path=None):
+def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_images, template_path=None, report_date=None):
     """
     Generates a Single-Page 'Case File' PDF with specific layout requirements.
+    Accepts 'report_date' string to override default server time.
     """
     if not reportlab_available:
         return None
@@ -84,9 +85,7 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         
         # --- Layout Constants ---
         left_margin = 50 
-        # Right Margin: Reduced by 0.25 inches. 
-        # Previous: 90pts (1.25in). New: 72pts (1.0in)
-        right_margin = 72 
+        right_margin = 72 # 1.0 inch
         
         # Vertical Shift
         shift_down = 134
@@ -96,9 +95,13 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         
         current_y = height - shift_down - 30 # Start position
         
+        # Determine Date string
+        if report_date is None:
+            report_date = datetime.now().strftime('%B %d, %Y')
+
         # --- 1. Subject & Date ---
         c.setFont("Helvetica-Bold", 12)
-        c.drawString(left_margin, current_y, f"Date: {datetime.now().strftime('%B %d, %Y')}")
+        c.drawString(left_margin, current_y, f"Date: {report_date}")
         current_y -= 15
         
         c.drawString(left_margin, current_y, f"Subject: {name}")
@@ -110,12 +113,11 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         current_y -= 10
         
         if pil_images:
-            # Force size for 2 across (for larger thumbnails)
+            # Force size for 2 across
             slots_across = 2
             gap = 10 
             
             # Calculate maximum dimensions for a single slot
-            # Reduced by 25% as requested previously
             max_slot_w = ((usable_width - (gap * (slots_across - 1))) / slots_across) * 0.75
             max_slot_h = max_slot_w # Use square bounding box for row height
             
@@ -130,21 +132,19 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
                 try:
                     # 1. Resize/Compress (Optimization)
                     img_copy = img.copy()
-                    img_copy.thumbnail((600, 600)) # Resized for quality but lower file size
+                    img_copy.thumbnail((600, 600)) 
                     
                     if img_copy.mode != 'RGB':
                         img_copy = img_copy.convert('RGB')
                         
-                    # 2. Calculate Scaled Dimensions (Fit inside box, preserving aspect ratio)
+                    # 2. Calculate Scaled Dimensions
                     iw, ih = img_copy.size
                     scale = min(max_slot_w / iw, max_slot_h / ih)
                     new_w = iw * scale
                     new_h = ih * scale
                     
                     # 3. Calculate Positioning
-                    # Left Align in Slot (so the first image hits the margin exactly)
                     draw_x = current_x 
-                    # Center Vertically in the row
                     draw_y = row_bottom_y + (max_slot_h - new_h) / 2
                     
                     # 4. Save to buffer for ReportLab
@@ -153,7 +153,7 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
                     img_buffer.seek(0)
                     img_reader = ImageReader(img_buffer)
                     
-                    # 5. Draw with explicit calculated dimensions
+                    # 5. Draw
                     c.drawImage(img_reader, draw_x, draw_y, width=new_w, height=new_h, mask='auto')
                     
                     # Move to next slot
@@ -173,21 +173,21 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         c.drawString(left_margin, current_y, "Official Elf Assessment:")
         current_y -= 15
         
-        c.setFont("Helvetica", 12) # UPDATED to 12pt
+        c.setFont("Helvetica", 12) 
         
-        # Calculate char wrap based on usable width (approx 7 pts per char for 12pt font)
+        # Calculate char wrap
         wrap_width = int(usable_width / 7) 
         wrapper = textwrap.TextWrapper(width=wrap_width)
         lines = wrapper.wrap(str(roast_content))
         
-        # Limit lines to ensure single page (approx 12-14 lines with larger font)
+        # Limit lines
         if len(lines) > 14:
             lines = lines[:14]
             lines[-1] += "..."
             
         for line in lines:
             c.drawString(left_margin, current_y, line)
-            current_y -= 15 # Increased spacing for larger font
+            current_y -= 15 
             
         current_y -= 20 # Gap
         
