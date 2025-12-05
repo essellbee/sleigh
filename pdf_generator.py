@@ -113,7 +113,8 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
             gap = 10 
             
             # Calculate maximum dimensions for a single slot
-            max_slot_w = (usable_width - (gap * (slots_across - 1))) / slots_across
+            # Reduced by 25% as requested
+            max_slot_w = ((usable_width - (gap * (slots_across - 1))) / slots_across) * 0.75
             max_slot_h = max_slot_w # Use square bounding box for row height
             
             # Bottom Y coordinate for the image row
