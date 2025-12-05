@@ -729,13 +729,13 @@ if st.session_state.result is None:
                     # Clear rotations when submitting
                     st.session_state.rotation_angles = {}
                     st.rerun()
-                 
-        else:
-            # The Payment Link
-            st.link_button("Buy Official Certificate", "https://buy.stripe.com/test_00w00k29UepK8l23bN4ZG00", use_container_width=True)
-            
-            if st.button("Post Your Roast", use_container_width=True):
-                share_text = f"{verdict_title}\n\nScore: {score}/10\n\n{data.get('roast_content', '')[:100]}..."
+                else:
+                    st.error("Oh no! The elves encountered a connection error. Please try submitting again.")
+
+    # Video Frame with image
+    # Removed gold-frame wrapper, just showing image
+    try:
+        st.image("assets/santa_frame.png", use_container_width=True)
     except:
         st.markdown("""
             <div style="position: relative; padding-top: 56.25%;">
@@ -974,7 +974,7 @@ else:
              
     else:
         # The Payment Link
-        st.link_button("Buy Official Certificate", "https://buy.stripe.com/dRm8wQcNt33n0FO9pAasg00", use_container_width=True)
+        st.link_button("Buy Official Certificate", "https://buy.stripe.com/test_00w00k29UepK8l23bN4ZG00", use_container_width=True)
         
         if st.button("Post Your Roast", use_container_width=True):
             share_text = f"{verdict_title}\n\nScore: {score}/10\n\n{data.get('roast_content', '')[:100]}..."
