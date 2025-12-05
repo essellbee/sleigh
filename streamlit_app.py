@@ -24,7 +24,6 @@ except ImportError:
 # --- APP CONFIGURATION ---
 st.set_page_config(
     page_title="Sleigh or Nay?",
-    page_icon="🎅",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -580,6 +579,20 @@ if st.session_state.result is None:
     
     st.markdown('<div class="intro-text">Santa is jumping on the AI bandwagon and outsourcing.</div>', unsafe_allow_html=True)
     
+    # Button to show camera
+    if not st.session_state.show_camera:
+        if st.button("OPEN CAMERA", use_container_width=True):
+            st.session_state.show_camera = True
+            st.rerun()
+    else:
+        # Use native Streamlit camera input
+        camera_photo = st.camera_input("Take a photo of your Christmas spirit!", key="camera")
+        
+        # Button to hide camera
+        if st.button("CLOSE CAMERA", use_container_width=True):
+            st.session_state.show_camera = False
+            st.rerun()
+    
     # File uploader
     uploaded_files = st.file_uploader(
         "Upload Photos", 
@@ -592,6 +605,8 @@ if st.session_state.result is None:
 
     # Combine camera photo with uploaded files
     all_files = []
+    if st.session_state.show_camera and 'camera_photo' in locals() and camera_photo:
+        all_files.append(camera_photo)
     if uploaded_files:
         all_files.extend(uploaded_files)
 
@@ -601,7 +616,14 @@ if st.session_state.result is None:
         
         for idx, file in enumerate(all_files):
             # Generate unique key for this file
-            file_key = f"upload_{idx}"
+            # Check if this is the camera photo
+            is_camera_photo = (st.session_state.show_camera and 'camera_photo' in locals() and camera_photo and file == camera_photo)
+            
+            if is_camera_photo:
+                file_key = "camera_photo"
+            else:
+                # Use index for unique key since file.name might not exist for camera
+                file_key = f"upload_{idx}"
             
             # Initialize rotation angle if not exists
             if file_key not in st.session_state.rotation_angles:
@@ -630,15 +652,20 @@ if st.session_state.result is None:
         if st.button("SUBMIT", use_container_width=True):
             # Check API key HERE in main thread
             if not api_key:
-                st.error("⚠️ Missing API Key! Please configure your secrets.")
+                st.error("Missing API Key! Please configure your secrets.")
             elif len(all_files) > 2: # Reduced Limit to 2
-                st.warning("⚠️ Limit 2 photos! The elves can only process so much...")
+                st.warning("Limit 2 photos! The elves can only process so much...")
             else:
                 # Load images with applied rotations
                 pil_images = []
                 for idx, file in enumerate(all_files):
                     # Check if this is the camera photo
-                    file_key = f"upload_{idx}"
+                    is_camera_photo = (st.session_state.show_camera and 'camera_photo' in locals() and camera_photo and file == camera_photo)
+                    
+                    if is_camera_photo:
+                        file_key = "camera_photo"
+                    else:
+                        file_key = f"upload_{idx}"
                     
                     img = load_image_preserve_orientation(file)
                     
@@ -656,16 +683,16 @@ if st.session_state.result is None:
                 
                 # Fun loading messages to cycle through
                 loading_texts = [
-                    "🎄 Elf-GPT is checking the list twice...",
-                    "☕ Sipping hot cocoa to stay warm...",
-                    "🦌 Asking Rudolph for a second opinion...",
-                    "📏 Measuring your holiday cheer coefficient...",
-                    "💡 Untangling the Christmas tree lights...",
-                    "🥕 Feeding carrots to the reindeer...",
-                    "❄️ Analyzing snow composition...",
-                    "🧝‍♂️ Consulting the High Council of Elves...",
-                    "🍪 Quality testing Santa's cookies...",
-                    "📜 Scanning the Naughty & Nice database..."
+                    "Elf-GPT is checking the list twice...",
+                    "Sipping hot cocoa to stay warm...",
+                    "Asking Rudolph for a second opinion...",
+                    "Measuring your holiday cheer coefficient...",
+                    "Untangling the Christmas tree lights...",
+                    "Feeding carrots to the reindeer...",
+                    "Analyzing snow composition...",
+                    "Consulting the High Council of Elves...",
+                    "Quality testing Santa's cookies...",
+                    "Scanning the Naughty & Nice database..."
                 ]
                 
                 # Container to store result from thread
@@ -727,7 +754,7 @@ if st.session_state.result is None:
                 <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
                             display: flex; align-items: center; justify-content: center;
                             font-family: 'Mountains of Christmas', cursive; font-size: 1.3rem; color: #5FBA47;">
-                    🎅<br>A MESSAGE FROM<br>THE NORTH POLE
+                    A MESSAGE FROM<br>THE NORTH POLE
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -763,7 +790,7 @@ else:
                 st.image("assets/happy_elf.png", use_container_width=True)
             except:
                 st.markdown(f"""
-                <div style='font-size:6rem; text-align:center;'>🧝‍♂️😊</div>
+                <div style='font-size:6rem; text-align:center;'>Sleigh!</div>
                 """, unsafe_allow_html=True)
                 
     else:
@@ -775,7 +802,7 @@ else:
                 st.image("assets/grumpy_elf.png", use_container_width=True)
             except:
                 st.markdown(f"""
-                <div style='font-size:6rem; text-align:center;'>🧝‍♂️👎</div>
+                <div style='font-size:6rem; text-align:center;'>Nay.</div>
                 """, unsafe_allow_html=True)
         
         with col_text:
@@ -816,7 +843,7 @@ else:
     # 3. Santa Footer
     st.markdown(f"""
     <div class="santa-comment-box">
-        <strong>🎅 Santa Says:</strong><br><br>
+        <strong>Santa Says:</strong><br><br>
         <em>{data.get("santa_comment", "Ho ho ho!")}</em>
     </div>
     """, unsafe_allow_html=True)
@@ -872,31 +899,31 @@ else:
             
             if test_pdf_bytes:
                 st.download_button(
-                    label="🛠️ TEST: Download Filled Certificate PDF",
+                    label="TEST: Download Filled Certificate PDF",
                     data=test_pdf_bytes,
                     file_name="Santa_Certificate_TEST.pdf",
                     mime="application/pdf",
                     use_container_width=True
                 )
             else:
-                st.warning("⚠️ Certificate generation returned None.")
+                st.warning("Certificate generation returned None.")
             
             if test_report_bytes:
                 st.download_button(
-                    label="🛠️ TEST: Download Case File PDF",
+                    label="TEST: Download Case File PDF",
                     data=test_report_bytes,
                     file_name=f"Official_Elf_Report_{safe_name_test}.pdf",
                     mime="application/pdf",
                     use_container_width=True
                 )
             else:
-                st.warning("⚠️ Case File generation returned None.")
+                st.warning("Case File generation returned None.")
         except Exception as e:
             st.error(f"Test Button Generation Failed: {e}")
         # -----------------------------------------------
 
         if payment_verified:
-            st.success("Payment Verified! 🎄")
+            st.success("Payment Verified!")
             
             # Select Template based on score/verdict
             is_sleigh = score >= 7
@@ -936,7 +963,7 @@ else:
                 type_str = "nice" if is_sleigh else "naughty"
                 
                 st.download_button(
-                    label="📥 DOWNLOAD CERTIFICATE",
+                    label="DOWNLOAD CERTIFICATE",
                     data=pdf_bytes,
                     file_name=f"certificate_{type_str}_{safe_name}.pdf",
                     mime="application/pdf",
@@ -945,7 +972,7 @@ else:
                 
             if report_bytes:
                 st.download_button(
-                    label="📥 DOWNLOAD FULL CASE FILE",
+                    label="DOWNLOAD FULL CASE FILE",
                     data=report_bytes,
                     file_name=f"Official_Elf_Report_{safe_name}.pdf",
                     mime="application/pdf",
@@ -961,11 +988,11 @@ else:
                  
         else:
             # The Payment Link
-            st.link_button("🏆 BUY OFFICIAL CERTIFICATE", "https://buy.stripe.com/dRm8wQcNt33n0FO9pAasg00", use_container_width=True)
+            st.link_button("BUY OFFICIAL CERTIFICATE", "https://buy.stripe.com/dRm8wQcNt33n0FO9pAasg00", use_container_width=True)
             
             if st.button("POST YOUR ROAST", use_container_width=True):
                 share_text = f"{verdict_title}\n\nScore: {score}/10\n\n{data.get('roast_content', '')[:100]}..."
-                st.info("📋 Ready to share! (Copy the text above)")
+                st.info("Ready to share! (Copy the text above)")
                 st.code(share_text)
             
             if st.button("START OVER", key="restart_unpaid", use_container_width=True):
