@@ -158,16 +158,16 @@ st.markdown("""
         width: 100%;
         background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%);
         color: white !important;
-        font-family: 'Roboto', sans-serif;
-        font-size: clamp(1.2rem, 4vw, 1.5rem); /* Increased font size */
-        font-weight: 900;
-        text-transform: uppercase;
+        font-family: 'Helvetica', 'Arial', sans-serif; /* Changed to Helvetica */
+        font-size: clamp(1.2rem, 4vw, 1.5rem);
+        font-weight: bold; /* Bold */
+        /* Removed text-transform: uppercase */
         border-radius: 50px;
-        padding: 18px 25px; /* Increased padding */
+        padding: 18px 25px;
         border: none;
         box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2);
         transition: all 0.15s;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -627,7 +627,7 @@ if st.session_state.result is None:
             
         st.markdown("<br>", unsafe_allow_html=True)
         
-        if st.button("SUBMIT", use_container_width=True):
+        if st.button("Submit", use_container_width=True):
             # Check API key HERE in main thread
             if not api_key:
                 st.error("Missing API Key! Please configure your secrets.")
@@ -872,7 +872,7 @@ else:
             
             if test_pdf_bytes:
                 st.download_button(
-                    label="TEST: Download Filled Certificate PDF",
+                    label="Test: Download Filled Certificate PDF",
                     data=test_pdf_bytes,
                     file_name="Santa_Certificate_TEST.pdf",
                     mime="application/pdf",
@@ -883,7 +883,7 @@ else:
             
             if test_report_bytes:
                 st.download_button(
-                    label="TEST: Download Case File PDF",
+                    label="Test: Download Case File PDF",
                     data=test_report_bytes,
                     file_name=f"Official_Elf_Report_{safe_name_test}.pdf",
                     mime="application/pdf",
@@ -936,7 +936,7 @@ else:
                 type_str = "nice" if is_sleigh else "naughty"
                 
                 st.download_button(
-                    label="DOWNLOAD CERTIFICATE",
+                    label="Download Certificate",
                     data=pdf_bytes,
                     file_name=f"certificate_{type_str}_{safe_name}.pdf",
                     mime="application/pdf",
@@ -945,14 +945,14 @@ else:
                 
             if report_bytes:
                 st.download_button(
-                    label="DOWNLOAD FULL CASE FILE",
+                    label="Download Full Case File",
                     data=report_bytes,
                     file_name=f"Official_Elf_Report_{safe_name}.pdf",
                     mime="application/pdf",
                     use_container_width=True
                 )
             
-            if st.button("START OVER", key="restart_paid", use_container_width=True):
+            if st.button("Start Over", key="restart_paid", use_container_width=True):
                  st.session_state.result = None
                  st.session_state.images = None
                  st.session_state.user_name = ""
@@ -961,14 +961,14 @@ else:
                  
         else:
             # The Payment Link
-            st.link_button("BUY OFFICIAL CERTIFICATE", "https://buy.stripe.com/dRm8wQcNt33n0FO9pAasg00", use_container_width=True)
+            st.link_button("Buy Official Certificate", "https://buy.stripe.com/dRm8wQcNt33n0FO9pAasg00", use_container_width=True)
             
-            if st.button("POST YOUR ROAST", use_container_width=True):
+            if st.button("Post Your Roast", use_container_width=True):
                 share_text = f"{verdict_title}\n\nScore: {score}/10\n\n{data.get('roast_content', '')[:100]}..."
                 st.info("Ready to share! (Copy the text above)")
                 st.code(share_text)
             
-            if st.button("START OVER", key="restart_unpaid", use_container_width=True):
+            if st.button("Start Over", key="restart_unpaid", use_container_width=True):
                 st.session_state.result = None
                 st.session_state.images = None
                 st.session_state.rotation_angles = {}
