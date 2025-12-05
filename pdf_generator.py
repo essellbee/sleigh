@@ -83,9 +83,9 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         width, height = letter # 612 x 792 points
         
         # --- Layout Constants ---
-        # Reduced margins to provide more space (less padding)
-        left_margin = 30
-        right_margin = 30
+        # Restored margins to standard to match request "I didn't want all content to move left"
+        left_margin = 50 
+        right_margin = 90 # 1.25 inches
         
         # Vertical Shift
         shift_down = 134
@@ -109,11 +109,11 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         current_y -= 10
         
         if pil_images:
-            # Force size for 5 across regardless of actual count (thumbnails)
+            # Force size for 5 across
             slots_across = 5
-            gap = 0 # Changed from 5 to 0 to remove gaps between images
+            gap = 5 # Small gap between images
             
-            # Calculate dimension for a single slot in a 5-column grid
+            # Calculate dimension for a single slot
             img_w = (usable_width - (gap * (slots_across - 1))) / slots_across
             img_h = img_w # Square thumbnails
             
@@ -125,10 +125,22 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
             
             for img in display_images:
                 try:
-                    # Resize/Compress Logic
+                    # Resize Logic: Square Crop then Thumbnail
                     img_copy = img.copy()
-                    img_copy.thumbnail((400, 400)) # Optimization
                     
+                    # 1. Square Crop (Center)
+                    w, h = img_copy.size
+                    min_dim = min(w, h)
+                    left = (w - min_dim) / 2
+                    top = (h - min_dim) / 2
+                    right = (w + min_dim) / 2
+                    bottom = (h + min_dim) / 2
+                    img_copy = img_copy.crop((left, top, right, bottom))
+                    
+                    # 2. Resize
+                    img_copy.thumbnail((400, 400)) 
+                    
+                    # 3. Convert for JPEG
                     if img_copy.mode != 'RGB':
                         img_copy = img_copy.convert('RGB')
                         
@@ -137,7 +149,9 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
                     img_buffer.seek(0)
                     img_reader = ImageReader(img_buffer)
                     
-                    c.drawImage(img_reader, current_x, img_y_pos, width=img_w, height=img_h, preserveAspectRatio=True)
+                    # Draw image (preserveAspectRatio=False because we already cropped to square)
+                    # This ensures it fills the box starting exactly at current_x
+                    c.drawImage(img_reader, current_x, img_y_pos, width=img_w, height=img_h)
                     current_x += img_w + gap
                 except Exception as e:
                     print(f"Img Error: {e}")
@@ -154,12 +168,12 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         current_y -= 15
         
         c.setFont("Helvetica", 10)
-        # Calculate char wrap based on usable width (approx 6 pts per char for 10pt font)
+        # Calculate char wrap based on usable width
         wrap_width = int(usable_width / 6) 
         wrapper = textwrap.TextWrapper(width=wrap_width)
         lines = wrapper.wrap(str(roast_content))
         
-        # Limit lines to ensure single page (approx 15 lines)
+        # Limit lines to ensure single page
         if len(lines) > 15:
             lines = lines[:15]
             lines[-1] += "..."
@@ -171,17 +185,14 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         current_y -= 20 # Gap
         
         # Helper for wrapping Verdict and Santa text
-        # Approx char width for 12pt font ~ 7pts
         wrap_width_12 = int(usable_width / 7)
         wrapper_12 = textwrap.TextWrapper(width=wrap_width_12)
 
         # --- 4. Verdict ---
-        # Label (Bold)
         c.setFont("Helvetica-Bold", 12)
         c.drawString(left_margin, current_y, "Verdict:")
         current_y -= 15 
         
-        # Content (Normal, Wrapped, Next Line)
         c.setFont("Helvetica", 12)
         verdict_lines = wrapper_12.wrap(str(verdict))
         for line in verdict_lines:
@@ -191,12 +202,10 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         current_y -= 10 # Gap
         
         # --- 5. Santa's Commentary ---
-        # Label (Bold)
         c.setFont("Helvetica-Bold", 12)
         c.drawString(left_margin, current_y, "Santa Says:")
         current_y -= 15
         
-        # Content (Normal, Wrapped, Next Line)
         c.setFont("Helvetica", 12) 
         santa_lines = wrapper_12.wrap(f"\"{santa_comment}\"")
         for line in santa_lines:
@@ -206,7 +215,7 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         current_y -= 15 # Gap
         
         # --- 6. Score ---
-        c.setFont("Helvetica-Bold", 12) # Matched to verdict font size
+        c.setFont("Helvetica-Bold", 12) 
         c.drawString(left_margin, current_y, f"Score: {score}/10")
 
         c.save()
