@@ -893,7 +893,7 @@ else:
                 st.download_button(
                     label="📥 DOWNLOAD CERTIFICATE",
                     data=pdf_bytes,
-                    file_name=f"certificate_{type_str}_{safe_name}.pdf",
+                    file_name=f"Santa_Certificate_2025_{safe_name}.pdf",
                     mime="application/pdf",
                     use_container_width=True
                 )
