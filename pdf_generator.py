@@ -98,10 +98,10 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         
         # --- 1. Subject & Date ---
         c.setFont("Helvetica-Bold", 12)
-        c.drawString(left_margin, current_y, f"Subject: {name}")
+        c.drawString(left_margin, current_y, f"Date: {datetime.now().strftime('%B %d, %Y')}")
         current_y -= 15
         
-        c.drawString(left_margin, current_y, f"Date: {datetime.now().strftime('%B %d, %Y')}")
+        c.drawString(left_margin, current_y, f"Subject: {name}")
         current_y -= 25 # Gap
         
         # --- 2. The Evidence (Images) ---
