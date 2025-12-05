@@ -405,6 +405,11 @@ st.markdown("""
     footer {display: none;}
     header {display: none;}
     
+    /* Disable Fullscreen on Images */
+    [data-testid="stImage"] img {
+        pointer-events: none;
+    }
+    
 </style>
 """, unsafe_allow_html=True)
 
