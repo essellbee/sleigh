@@ -851,10 +851,14 @@ else:
         )
         
         if test_pdf_bytes:
+            # Create dynamic filename for test
+            safe_name_test = name_on_cert_test.strip().replace(" ", "_")
+            type_str_test = "nice" if is_sleigh_test else "naughty"
+            
             st.download_button(
                 label="🛠️ TEST: Download Filled Certificate PDF",
                 data=test_pdf_bytes,
-                file_name=f"Santa_Certificate_{'Nice' if is_sleigh_test else 'Naughty'}.pdf",
+                file_name=f"certificate_{type_str_test}_{safe_name_test}.pdf",
                 mime="application/pdf",
                 use_container_width=True
             )
@@ -882,10 +886,14 @@ else:
             )
             
             if pdf_bytes:
+                # Create dynamic filename
+                safe_name = name_on_cert.strip().replace(" ", "_")
+                type_str = "nice" if is_sleigh else "naughty"
+                
                 st.download_button(
                     label="📥 DOWNLOAD CERTIFICATE",
                     data=pdf_bytes,
-                    file_name=f"Santa_Certificate_{'Nice' if is_sleigh else 'Naughty'}.pdf",
+                    file_name=f"certificate_{type_str}_{safe_name}.pdf",
                     mime="application/pdf",
                     use_container_width=True
                 )
