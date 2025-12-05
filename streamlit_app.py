@@ -405,11 +405,21 @@ st.markdown("""
     footer {display: none;}
     header {display: none;}
     
-    /* Disable Fullscreen on Images - TARGET CONTAINER */
+    /* STRONG Disable Fullscreen on Images */
+    /* 1. Disable pointer events on the image container */
     [data-testid="stImage"] {
         pointer-events: none;
     }
-    /* Force hide fullscreen button just in case */
+    /* 2. Hide the fullscreen button by attribute */
+    button[title="View fullscreen"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    /* 3. Hide any button inside the image container */
+    [data-testid="stImage"] button {
+        display: none !important;
+    }
+    /* 4. Force hide StyledFullScreenButton */
     [data-testid="StyledFullScreenButton"] {
         display: none !important;
     }
