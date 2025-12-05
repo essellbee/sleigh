@@ -83,7 +83,6 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         width, height = letter # 612 x 792 points
         
         # --- Layout Constants ---
-        # Restored margins to standard to match request "I didn't want all content to move left"
         left_margin = 50 
         right_margin = 90 # 1.25 inches
         
@@ -109,15 +108,16 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         current_y -= 10
         
         if pil_images:
-            # Force size for 5 across
+            # Force layout for 5 columns
             slots_across = 5
-            gap = 5 # Small gap between images
+            gap = 5 
             
-            # Calculate dimension for a single slot
-            img_w = (usable_width - (gap * (slots_across - 1))) / slots_across
-            img_h = img_w # Square thumbnails
+            # Calculate maximum dimensions for a single slot
+            max_slot_w = (usable_width - (gap * (slots_across - 1))) / slots_across
+            max_slot_h = max_slot_w # Use square bounding box for row height
             
-            img_y_pos = current_y - img_h
+            # Bottom Y coordinate for the image row
+            row_bottom_y = current_y - max_slot_h
             current_x = left_margin
             
             # Draw up to 5 images
@@ -125,38 +125,41 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
             
             for img in display_images:
                 try:
-                    # Resize Logic: Square Crop then Thumbnail
+                    # 1. Resize/Compress (Optimization)
                     img_copy = img.copy()
+                    img_copy.thumbnail((600, 600)) # Resized for quality but lower file size
                     
-                    # 1. Square Crop (Center)
-                    w, h = img_copy.size
-                    min_dim = min(w, h)
-                    left = (w - min_dim) / 2
-                    top = (h - min_dim) / 2
-                    right = (w + min_dim) / 2
-                    bottom = (h + min_dim) / 2
-                    img_copy = img_copy.crop((left, top, right, bottom))
-                    
-                    # 2. Resize
-                    img_copy.thumbnail((400, 400)) 
-                    
-                    # 3. Convert for JPEG
                     if img_copy.mode != 'RGB':
                         img_copy = img_copy.convert('RGB')
                         
+                    # 2. Calculate Scaled Dimensions (Fit inside box, preserving aspect ratio)
+                    iw, ih = img_copy.size
+                    scale = min(max_slot_w / iw, max_slot_h / ih)
+                    new_w = iw * scale
+                    new_h = ih * scale
+                    
+                    # 3. Calculate Positioning
+                    # Left Align in Slot (so the first image hits the margin exactly)
+                    draw_x = current_x 
+                    # Center Vertically in the row
+                    draw_y = row_bottom_y + (max_slot_h - new_h) / 2
+                    
+                    # 4. Save to buffer for ReportLab
                     img_buffer = io.BytesIO()
                     img_copy.save(img_buffer, format='JPEG', quality=85)
                     img_buffer.seek(0)
                     img_reader = ImageReader(img_buffer)
                     
-                    # Draw image (preserveAspectRatio=False because we already cropped to square)
-                    # This ensures it fills the box starting exactly at current_x
-                    c.drawImage(img_reader, current_x, img_y_pos, width=img_w, height=img_h)
-                    current_x += img_w + gap
+                    # 5. Draw with explicit calculated dimensions
+                    c.drawImage(img_reader, draw_x, draw_y, width=new_w, height=new_h, mask='auto')
+                    
+                    # Move to next slot
+                    current_x += max_slot_w + gap
+                    
                 except Exception as e:
                     print(f"Img Error: {e}")
             
-            current_y -= (img_h + 20) # Move down past images row
+            current_y -= (max_slot_h + 20) # Move down past images row
         else:
             c.setFont("Helvetica-Oblique", 10)
             c.drawString(left_margin, current_y - 15, "(No visual evidence submitted)")
