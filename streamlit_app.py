@@ -153,53 +153,66 @@ st.markdown("""
         font-family: 'Courier New', monospace;
     }
 
-    /* 3. Button Styling (Green Pill) - Updated to include Link Buttons */
-    div.stButton > button, div.stLinkButton > a, div.stDownloadButton > button {
+    /* 3. Aggressive Button Styling using Data Test IDs */
+    [data-testid="stButton"] button, 
+    [data-testid="stLinkButton"] a, 
+    [data-testid="stDownloadButton"] button {
         width: 100%;
-        background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%);
+        background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%) !important;
         color: white !important;
+        border: none !important;
+        border-radius: 50px !important;
+        padding: 18px 25px !important;
         font-family: 'Helvetica', 'Arial', sans-serif !important;
+        font-weight: bold !important;
         font-size: clamp(1.2rem, 4vw, 1.5rem) !important;
-        font-weight: 900 !important;
+        box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2) !important;
+        transition: all 0.15s !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-decoration: none !important;
         text-transform: none !important;
-        border-radius: 50px;
-        padding: 18px 25px;
-        border: none;
-        box-shadow: 0px 6px 0px #357A2B, 0px 8px 15px rgba(0,0,0,0.2);
-        transition: all 0.15s;
-        letter-spacing: 0.5px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-decoration: none;
     }
 
-    /* Force inner text elements to inherit styles - CRITICAL FIX */
-    div.stButton > button p, div.stLinkButton > a p, div.stDownloadButton > button p {
+    /* Force ALL children elements (p tags, spans) to inherit the white color */
+    [data-testid="stButton"] button *, 
+    [data-testid="stLinkButton"] a *, 
+    [data-testid="stDownloadButton"] button * {
         color: white !important;
-        font-weight: 900 !important;
         font-family: 'Helvetica', 'Arial', sans-serif !important;
-        font-size: clamp(1.2rem, 4vw, 1.5rem) !important;
+        font-weight: bold !important;
+        fill: white !important; /* For icons if any */
     }
 
-    div.stButton > button:hover, div.stLinkButton > a:hover, div.stDownloadButton > button:hover {
-        background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%);
+    /* Hover States */
+    [data-testid="stButton"] button:hover, 
+    [data-testid="stLinkButton"] a:hover, 
+    [data-testid="stDownloadButton"] button:hover {
+        background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%) !important;
         transform: translateY(-2px);
-        box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25);
-        color: white !important;
-        border: none;
-    }
-    
-    /* Force hover text color */
-    div.stButton > button:hover p, div.stLinkButton > a:hover p, div.stDownloadButton > button:hover p {
+        box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25) !important;
         color: white !important;
     }
-    
-    div.stButton > button:active, div.stLinkButton > a:active, div.stDownloadButton > button:active {
+
+    /* Active States */
+    [data-testid="stButton"] button:active, 
+    [data-testid="stLinkButton"] a:active, 
+    [data-testid="stDownloadButton"] button:active {
         transform: translateY(3px);
-        box-shadow: 0px 3px 0px #357A2B, 0px 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0px 3px 0px #357A2B, 0px 4px 8px rgba(0,0,0,0.2) !important;
         color: white !important;
-        border: none;
+        border: none !important;
+    }
+
+    /* Secondary Button Override (Grey) */
+    .secondary-btn [data-testid="stButton"] button {
+        background: linear-gradient(180deg, #B0B0B0 0%, #909090 100%) !important;
+        box-shadow: 0px 5px 0px #606060, 0px 6px 12px rgba(0,0,0,0.2) !important;
+    }
+    
+    .secondary-btn [data-testid="stButton"] button:hover {
+        background: linear-gradient(180deg, #C0C0C0 0%, #A0A0A0 100%) !important;
     }
 
     /* Camera/Upload buttons in two-column layout */
@@ -246,17 +259,6 @@ st.markdown("""
         border: 1px solid #bee5eb !important;
         border-radius: 10px !important;
         padding: 12px !important;
-    }
-
-    /* Secondary Button (Grey for Share/Reset) */
-    .secondary-btn > div.stButton > button {
-        background: linear-gradient(180deg, #B0B0B0 0%, #909090 100%);
-        box-shadow: 0px 5px 0px #606060, 0px 6px 12px rgba(0,0,0,0.2);
-        font-size: 1rem;
-    }
-    
-    .secondary-btn > div.stButton > button:hover {
-        background: linear-gradient(180deg, #C0C0C0 0%, #A0A0A0 100%);
     }
 
     /* 4. Gold Frame Video */
@@ -727,13 +729,13 @@ if st.session_state.result is None:
                     # Clear rotations when submitting
                     st.session_state.rotation_angles = {}
                     st.rerun()
-                else:
-                    st.error("Oh no! The elves encountered a connection error. Please try submitting again.")
-
-    # Video Frame with image
-    # Removed gold-frame wrapper, just showing image
-    try:
-        st.image("assets/santa_frame.png", use_container_width=True)
+                 
+        else:
+            # The Payment Link
+            st.link_button("Buy Official Certificate", "https://buy.stripe.com/test_00w00k29UepK8l23bN4ZG00", use_container_width=True)
+            
+            if st.button("Post Your Roast", use_container_width=True):
+                share_text = f"{verdict_title}\n\nScore: {score}/10\n\n{data.get('roast_content', '')[:100]}..."
     except:
         st.markdown("""
             <div style="position: relative; padding-top: 56.25%;">
@@ -836,154 +838,152 @@ else:
 
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # 4. Action Buttons
-    col_left, col_center, col_right = st.columns([1, 4, 1])
+    # 4. Action Buttons - Full Width
+    
+    # Check for payment success via session_id or legacy 'paid' param
+    query_params = st.query_params
+    session_id = query_params.get("session_id")
+    
+    # Verify
+    payment_verified = verify_payment(session_id)
 
-    with col_center:
-        # Check for payment success via session_id or legacy 'paid' param
-        query_params = st.query_params
-        session_id = query_params.get("session_id")
+    # --- TEST PDF GENERATION (Visible for testing) ---
+    try:
+        # Reuse logic to determine template
+        is_sleigh_test = score >= 7
         
-        # Verify
-        payment_verified = verify_payment(session_id)
+        # Determine templates
+        cert_template_test = "assets/certificate_nice.pdf" if is_sleigh_test else "assets/certificate_naughty.pdf"
+        report_template_test = "assets/elf_report_sleigh.pdf" if is_sleigh_test else "assets/elf_report_nay.pdf"
+        
+        # Use stored name or fallback
+        name_on_cert_test = st.session_state.get("user_name", "Test User")
+        if not name_on_cert_test:
+            name_on_cert_test = "Test User"
+        
+        safe_name_test = name_on_cert_test.strip().replace(" ", "_")
 
-        # --- TEST PDF GENERATION (Visible for testing) ---
-        try:
-            # Reuse logic to determine template
-            is_sleigh_test = score >= 7
-            
-            # Determine templates
-            cert_template_test = "assets/certificate_nice.pdf" if is_sleigh_test else "assets/certificate_naughty.pdf"
-            report_template_test = "assets/elf_report_sleigh.pdf" if is_sleigh_test else "assets/elf_report_nay.pdf"
-            
-            # Use stored name or fallback
-            name_on_cert_test = st.session_state.get("user_name", "Test User")
-            if not name_on_cert_test:
-                name_on_cert_test = "Test User"
-            
-            safe_name_test = name_on_cert_test.strip().replace(" ", "_")
-
-            test_pdf_bytes = pdf_generator.create_certificate_pdf(
-                name=name_on_cert_test,
-                verdict=data.get('verdict_title', "Sleigh or Nay?"),
-                score=score,
-                comment=data.get('santa_comment', "Ho Ho Ho!"),
-                template_path=cert_template_test
+        test_pdf_bytes = pdf_generator.create_certificate_pdf(
+            name=name_on_cert_test,
+            verdict=data.get('verdict_title', "Sleigh or Nay?"),
+            score=score,
+            comment=data.get('santa_comment', "Ho Ho Ho!"),
+            template_path=cert_template_test
+        )
+        
+        # Generate the Case File
+        test_report_bytes = pdf_generator.create_roast_report(
+            name=name_on_cert_test,
+            verdict=data.get('verdict_title', "Sleigh or Nay?"),
+            score=score,
+            roast_content=data.get('roast_content', "No roast found."),
+            santa_comment=data.get('santa_comment', "Ho Ho Ho!"),
+            pil_images=st.session_state.images,
+            template_path=report_template_test,
+            report_date=time.strftime('%B %d, %Y') 
+        )
+        
+        if test_pdf_bytes:
+            st.download_button(
+                label="Test: Download Filled Certificate PDF",
+                data=test_pdf_bytes,
+                file_name="Santa_Certificate_TEST.pdf",
+                mime="application/pdf",
+                use_container_width=True
             )
-            
-            # Generate the Case File
-            test_report_bytes = pdf_generator.create_roast_report(
-                name=name_on_cert_test,
-                verdict=data.get('verdict_title', "Sleigh or Nay?"),
-                score=score,
-                roast_content=data.get('roast_content', "No roast found."),
-                santa_comment=data.get('santa_comment', "Ho Ho Ho!"),
-                pil_images=st.session_state.images,
-                template_path=report_template_test,
-                report_date=time.strftime('%B %d, %Y') 
-            )
-            
-            if test_pdf_bytes:
-                st.download_button(
-                    label="Test: Download Filled Certificate PDF",
-                    data=test_pdf_bytes,
-                    file_name="Santa_Certificate_TEST.pdf",
-                    mime="application/pdf",
-                    use_container_width=True
-                )
-            else:
-                st.warning("Certificate generation returned None.")
-            
-            if test_report_bytes:
-                st.download_button(
-                    label="Test: Download Case File PDF",
-                    data=test_report_bytes,
-                    file_name=f"Official_Elf_Report_{safe_name_test}.pdf",
-                    mime="application/pdf",
-                    use_container_width=True
-                )
-            else:
-                st.warning("Case File generation returned None.")
-        except Exception as e:
-            st.error(f"Test Button Generation Failed: {e}")
-        # -----------------------------------------------
-
-        if payment_verified:
-            st.success("Payment Verified!")
-            
-            # Select Template based on score/verdict
-            is_sleigh = score >= 7
-            cert_template = "assets/certificate_nice.pdf" if is_sleigh else "assets/certificate_naughty.pdf"
-            report_template = "assets/elf_report_sleigh.pdf" if is_sleigh else "assets/elf_report_nay.pdf"
-            
-            # Use stored name or fallback
-            name_on_cert = st.session_state.get("user_name", "Valued Elf-Enthusiast")
-            if not name_on_cert:
-                name_on_cert = "Valued Elf-Enthusiast"
-            
-            safe_name = name_on_cert.strip().replace(" ", "_")
-
-            # Generate the PDF Certificate using the utility module
-            pdf_bytes = pdf_generator.create_certificate_pdf(
-                name=name_on_cert,
-                verdict=data.get('verdict_title', "Sleigh or Nay?"),
-                score=score,
-                comment=data.get('santa_comment', "Ho Ho Ho!"),
-                template_path=cert_template
-            )
-            
-            # Generate the Case File
-            report_bytes = pdf_generator.create_roast_report(
-                name=name_on_cert,
-                verdict=data.get('verdict_title', "Sleigh or Nay?"),
-                score=score,
-                roast_content=data.get('roast_content', "No roast found."),
-                santa_comment=data.get('santa_comment', "Ho Ho Ho!"),
-                pil_images=st.session_state.images,
-                template_path=report_template,
-                report_date=time.strftime('%B %d, %Y')
-            )
-            
-            if pdf_bytes:
-                # Create dynamic filename
-                type_str = "nice" if is_sleigh else "naughty"
-                
-                st.download_button(
-                    label="Download Certificate",
-                    data=pdf_bytes,
-                    file_name=f"certificate_{type_str}_{safe_name}.pdf",
-                    mime="application/pdf",
-                    use_container_width=True
-                )
-                
-            if report_bytes:
-                st.download_button(
-                    label="Download Full Case File",
-                    data=report_bytes,
-                    file_name=f"Official_Elf_Report_{safe_name}.pdf",
-                    mime="application/pdf",
-                    use_container_width=True
-                )
-            
-            if st.button("Start Over", key="restart_paid", use_container_width=True):
-                 st.session_state.result = None
-                 st.session_state.images = None
-                 st.session_state.user_name = ""
-                 st.query_params.clear()
-                 st.rerun()
-                 
         else:
-            # The Payment Link
-            st.link_button("Buy Official Certificate", "https://buy.stripe.com/dRm8wQcNt33n0FO9pAasg00", use_container_width=True)
+            st.warning("Certificate generation returned None.")
+        
+        if test_report_bytes:
+            st.download_button(
+                label="Test: Download Case File PDF",
+                data=test_report_bytes,
+                file_name=f"Official_Elf_Report_{safe_name_test}.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
+        else:
+            st.warning("Case File generation returned None.")
+    except Exception as e:
+        st.error(f"Test Button Generation Failed: {e}")
+    # -----------------------------------------------
+
+    if payment_verified:
+        st.success("Payment Verified!")
+        
+        # Select Template based on score/verdict
+        is_sleigh = score >= 7
+        cert_template = "assets/certificate_nice.pdf" if is_sleigh else "assets/certificate_naughty.pdf"
+        report_template = "assets/elf_report_sleigh.pdf" if is_sleigh else "assets/elf_report_nay.pdf"
+        
+        # Use stored name or fallback
+        name_on_cert = st.session_state.get("user_name", "Valued Elf-Enthusiast")
+        if not name_on_cert:
+            name_on_cert = "Valued Elf-Enthusiast"
+        
+        safe_name = name_on_cert.strip().replace(" ", "_")
+
+        # Generate the PDF Certificate using the utility module
+        pdf_bytes = pdf_generator.create_certificate_pdf(
+            name=name_on_cert,
+            verdict=data.get('verdict_title', "Sleigh or Nay?"),
+            score=score,
+            comment=data.get('santa_comment', "Ho Ho Ho!"),
+            template_path=cert_template
+        )
+        
+        # Generate the Case File
+        report_bytes = pdf_generator.create_roast_report(
+            name=name_on_cert,
+            verdict=data.get('verdict_title', "Sleigh or Nay?"),
+            score=score,
+            roast_content=data.get('roast_content', "No roast found."),
+            santa_comment=data.get('santa_comment', "Ho Ho Ho!"),
+            pil_images=st.session_state.images,
+            template_path=report_template,
+            report_date=time.strftime('%B %d, %Y')
+        )
+        
+        if pdf_bytes:
+            # Create dynamic filename
+            type_str = "nice" if is_sleigh else "naughty"
             
-            if st.button("Post Your Roast", use_container_width=True):
-                share_text = f"{verdict_title}\n\nScore: {score}/10\n\n{data.get('roast_content', '')[:100]}..."
-                st.info("Ready to share! (Copy the text above)")
-                st.code(share_text)
+            st.download_button(
+                label="Download Certificate",
+                data=pdf_bytes,
+                file_name=f"certificate_{type_str}_{safe_name}.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
             
-            if st.button("Start Over", key="restart_unpaid", use_container_width=True):
-                st.session_state.result = None
-                st.session_state.images = None
-                st.session_state.rotation_angles = {}
-                st.session_state.show_camera = False
-                st.rerun()
+        if report_bytes:
+            st.download_button(
+                label="Download Full Case File",
+                data=report_bytes,
+                file_name=f"Official_Elf_Report_{safe_name}.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
+        
+        if st.button("Start Over", key="restart_paid", use_container_width=True):
+             st.session_state.result = None
+             st.session_state.images = None
+             st.session_state.user_name = ""
+             st.query_params.clear()
+             st.rerun()
+             
+    else:
+        # The Payment Link
+        st.link_button("Buy Official Certificate", "https://buy.stripe.com/dRm8wQcNt33n0FO9pAasg00", use_container_width=True)
+        
+        if st.button("Post Your Roast", use_container_width=True):
+            share_text = f"{verdict_title}\n\nScore: {score}/10\n\n{data.get('roast_content', '')[:100]}..."
+            st.info("Ready to share! (Copy the text above)")
+            st.code(share_text)
+        
+        if st.button("Start Over", key="restart_unpaid", use_container_width=True):
+            st.session_state.result = None
+            st.session_state.images = None
+            st.session_state.rotation_angles = {}
+            st.session_state.show_camera = False
+            st.rerun()
