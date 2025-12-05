@@ -434,8 +434,6 @@ if 'images' not in st.session_state:
     st.session_state.images = None
 if 'rotation_angles' not in st.session_state:
     st.session_state.rotation_angles = {}
-if 'show_camera' not in st.session_state:
-    st.session_state.show_camera = False
 if 'user_name' not in st.session_state:
     st.session_state.user_name = ""
 
@@ -577,20 +575,6 @@ if st.session_state.result is None:
     
     st.markdown('<div class="intro-text">Santa is jumping on the AI bandwagon and outsourcing.</div>', unsafe_allow_html=True)
     
-    # Button to show camera
-    if not st.session_state.show_camera:
-        if st.button("📸 OPEN CAMERA", use_container_width=True):
-            st.session_state.show_camera = True
-            st.rerun()
-    else:
-        # Use native Streamlit camera input
-        camera_photo = st.camera_input("📸 Take a photo of your Christmas spirit!", key="camera")
-        
-        # Button to hide camera
-        if st.button("❌ CLOSE CAMERA", use_container_width=True):
-            st.session_state.show_camera = False
-            st.rerun()
-    
     # File uploader
     uploaded_files = st.file_uploader(
         "Upload Photos", 
@@ -603,8 +587,6 @@ if st.session_state.result is None:
 
     # Combine camera photo with uploaded files
     all_files = []
-    if st.session_state.show_camera and 'camera_photo' in locals() and camera_photo:
-        all_files.append(camera_photo)
     if uploaded_files:
         all_files.extend(uploaded_files)
 
@@ -614,14 +596,7 @@ if st.session_state.result is None:
         
         for idx, file in enumerate(all_files):
             # Generate unique key for this file
-            # Check if this is the camera photo
-            is_camera_photo = (st.session_state.show_camera and 'camera_photo' in locals() and camera_photo and file == camera_photo)
-            
-            if is_camera_photo:
-                file_key = "camera_photo"
-            else:
-                # Use index for unique key since file.name might not exist for camera
-                file_key = f"upload_{idx}"
+            file_key = f"upload_{idx}"
             
             # Initialize rotation angle if not exists
             if file_key not in st.session_state.rotation_angles:
@@ -658,12 +633,7 @@ if st.session_state.result is None:
                 pil_images = []
                 for idx, file in enumerate(all_files):
                     # Check if this is the camera photo
-                    is_camera_photo = (st.session_state.show_camera and 'camera_photo' in locals() and camera_photo and file == camera_photo)
-                    
-                    if is_camera_photo:
-                        file_key = "camera_photo"
-                    else:
-                        file_key = f"upload_{idx}"
+                    file_key = f"upload_{idx}"
                     
                     img = load_image_preserve_orientation(file)
                     
