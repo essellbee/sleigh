@@ -574,11 +574,11 @@ if st.session_state.result is None:
     
     # File uploader
     uploaded_files = st.file_uploader(
-        "Upload Photos", # Changed from empty string to fix warning
+        "Upload Photos", 
         type=['png', 'jpg', 'jpeg'], 
         accept_multiple_files=True,
         key="file_uploader",
-        help="Upload up to 5 photos",
+        help="Upload up to 2 photos",
         label_visibility="collapsed"
     )
 
@@ -632,8 +632,8 @@ if st.session_state.result is None:
             # Check API key HERE in main thread
             if not api_key:
                 st.error("⚠️ Missing API Key! Please configure your secrets.")
-            elif len(all_files) > 5:
-                st.warning("⚠️ Limit 5 photos! The elves can only process so much...")
+            elif len(all_files) > 2: # Reduced Limit to 2
+                st.warning("⚠️ Limit 2 photos! The elves can only process so much...")
             else:
                 # Load images with applied rotations
                 pil_images = []
