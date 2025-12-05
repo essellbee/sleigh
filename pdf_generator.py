@@ -1,6 +1,7 @@
 import io
 import os
 import textwrap
+from datetime import datetime
 
 # Try importing ReportLab components safely
 try:
@@ -69,10 +70,9 @@ def create_certificate_pdf(name, verdict, score, comment, template_path):
         print(f"Certificate Error: {e}")
         return None
 
-def create_roast_report(name, verdict, score, roast_content, pil_images, template_path=None):
+def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_images, template_path=None):
     """
-    Generates a Single-Page 'Case File' PDF.
-    Simplification: Assumes content fits on one page to ensure template merging works reliably.
+    Generates a Single-Page 'Case File' PDF with specific layout requirements.
     """
     if not reportlab_available:
         return None
@@ -80,108 +80,118 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
     try:
         buffer = io.BytesIO()
         c = canvas.Canvas(buffer, pagesize=letter)
-        width, height = letter
+        width, height = letter # 612 x 792 points
         
-        # Shift content down to accommodate header graphics
-        shift_down = 90 
+        # --- Layout Constants ---
+        left_margin = 50
+        right_margin = 144 # 2 inches * 72 points
+        top_margin = 90 # Shift down for header graphics
         
-        # --- Header Text ---
-        c.setFont("Helvetica-Bold", 24)
-        c.drawString(50, height - 50 - shift_down, "Elf-GPT: Official Case File")
+        # Calculate usable width constraint
+        # Page Width (612) - Left Margin (50) - Right Margin (144) = 418 pts
+        usable_width = width - left_margin - right_margin
         
-        c.setFont("Helvetica", 12)
-        c.drawString(50, height - 80 - shift_down, f"Subject: {name}")
-        c.drawString(50, height - 100 - shift_down, f"Verdict: {verdict} (Score: {score}/10)")
+        current_y = height - top_margin - 30 # Start position
         
-        c.setLineWidth(1)
-        c.line(50, height - 110 - shift_down, width - 50, height - 110 - shift_down)
+        # --- 1. Subject & Date ---
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(left_margin, current_y, f"Subject: {name}")
+        current_y -= 15
         
-        # --- Roast Content ---
-        text_y = height - 140 - shift_down
-        c.setFont("Helvetica-Bold", 14)
-        c.drawString(50, text_y, "The Assessment:")
-        text_y -= 20
+        c.drawString(left_margin, current_y, f"Date: {datetime.now().strftime('%B %d, %Y')}")
+        current_y -= 25 # Gap
         
-        c.setFont("Helvetica", 11)
-        wrapper = textwrap.TextWrapper(width=90) 
-        lines = wrapper.wrap(str(roast_content))
+        # --- 2. The Evidence (Images) ---
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(left_margin, current_y, "The Evidence:")
+        current_y -= 10
         
-        # Limit lines to prevent overflow into images since we are strictly single page now
-        max_lines = 15
-        if len(lines) > max_lines:
-            lines = lines[:max_lines]
-            lines[-1] += "..."
-
-        for line in lines:
-            c.drawString(50, text_y, line)
-            text_y -= 15
-            
-        text_y -= 20 
-        
-        # --- Images (Optimized & Limited for Single Page) ---
         if pil_images:
-            c.setFont("Helvetica-Bold", 14)
-            c.drawString(50, text_y, "The Evidence:")
-            text_y -= 10
+            # Calculate image dimensions for 5 across
+            # Usable width: 418. Gaps: 4 * 5pts = 20pts. 
+            # Remaining: 398. Per image: ~79pts.
+            gap = 5
+            img_count = min(len(pil_images), 5) # Max 5 images
+            img_w = (usable_width - (gap * (img_count - 1))) / img_count
+            img_h = img_w # Square thumbnails
             
-            img_width = 150
-            img_height = 150
-            x_start = 50
-            gap = 20
+            img_y_pos = current_y - img_h
+            current_x = left_margin
             
-            current_x = x_start
-            current_y = text_y - img_height
-            
-            # Limit images to what fits on one row (max 3 or 4) to guarantee single page
-            # standard letter width is 612. 50 margin L, 50 margin R. 512 usable.
-            # 150+20 = 170 per image. 3 images = 510. Perfect fit for 3 images.
-            display_images = pil_images[:3] 
-            
-            for img in display_images:
+            for i in range(img_count):
                 try:
-                    # 1. Resize & Compress
-                    img_copy = img.copy()
-                    img_copy.thumbnail((800, 800)) 
+                    img = pil_images[i]
                     
-                    if img_copy.mode in ('RGBA', 'LA') or (img_copy.mode == 'P' and 'transparency' in img_copy.info):
-                        background = ImageOps.new('RGB', img_copy.size, (255, 255, 255))
-                        if img_copy.mode == 'P':
-                            img_copy = img_copy.convert('RGBA')
-                        background.paste(img_copy, mask=img_copy.split()[-1])
-                        img_copy = background
-                    elif img_copy.mode != 'RGB':
+                    # Resize/Compress Logic
+                    img_copy = img.copy()
+                    img_copy.thumbnail((400, 400)) # Smaller thumb
+                    
+                    if img_copy.mode != 'RGB':
                         img_copy = img_copy.convert('RGB')
                         
                     img_buffer = io.BytesIO()
                     img_copy.save(img_buffer, format='JPEG', quality=85)
                     img_buffer.seek(0)
-                    
-                    # 2. Draw
                     img_reader = ImageReader(img_buffer)
-                    c.drawImage(img_reader, current_x, current_y, width=img_width, height=img_height, preserveAspectRatio=True)
                     
-                    current_x += img_width + gap
-                        
-                except Exception as img_e:
-                    print(f"Image Error: {img_e}")
-                    c.drawString(current_x, current_y + 75, "[Image Failed]")
+                    c.drawImage(img_reader, current_x, img_y_pos, width=img_w, height=img_h, preserveAspectRatio=True)
+                    current_x += img_w + gap
+                except Exception as e:
+                    print(f"Img Error: {e}")
+            
+            current_y -= (img_h + 20) # Move down past images
+        else:
+            c.setFont("Helvetica-Oblique", 10)
+            c.drawString(left_margin, current_y - 15, "(No visual evidence submitted)")
+            current_y -= 40
+
+        # --- 3. Official Elf Assessment ---
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(left_margin, current_y, "Official Elf Assessment:")
+        current_y -= 15
+        
+        c.setFont("Helvetica", 10)
+        # Calculate char wrap based on usable width (approx 6 pts per char for 10pt font)
+        wrap_width = int(usable_width / 6) 
+        wrapper = textwrap.TextWrapper(width=wrap_width)
+        lines = wrapper.wrap(str(roast_content))
+        
+        # Limit lines to ensure single page
+        if len(lines) > 20:
+            lines = lines[:20]
+            lines[-1] += "..."
+            
+        for line in lines:
+            c.drawString(left_margin, current_y, line)
+            current_y -= 12
+            
+        current_y -= 15 # Gap
+        
+        # --- 4. Verdict ---
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(left_margin, current_y, f"Verdict: {verdict}")
+        
+        # One-liner on same line or next? "followed by" implies flow.
+        # Let's put the oneliner on the next line indented or quoted
+        current_y -= 15
+        c.setFont("Helvetica-Oblique", 11)
+        c.drawString(left_margin + 20, current_y, f"\"{santa_comment}\"")
+        current_y -= 25
+        
+        # --- 5. Score ---
+        c.setFont("Helvetica-Bold", 14)
+        c.drawString(left_margin, current_y, f"Score: {score}/10")
 
         c.save()
         buffer.seek(0)
         
-        # --- Template Merging (Simple Single Page) ---
+        # --- Template Merging ---
         if template_path and os.path.exists(template_path) and pypdf_available:
             try:
                 content_pdf = PdfReader(buffer)
                 template_pdf = PdfReader(open(template_path, "rb"))
-                
-                # Get the Background Page (Template)
                 output_page = template_pdf.pages[0]
-                
-                # Get the Content Page (We just generated this)
                 content_page = content_pdf.pages[0]
-                
-                # Merge content ON TOP of template
                 output_page.merge_page(content_page)
                 
                 output = PdfWriter()
@@ -196,8 +206,6 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
                 buffer.seek(0)
                 return buffer
         else:
-            if template_path:
-                print(f"Report Template missing: {template_path}")
             return buffer
 
     except Exception as e:
