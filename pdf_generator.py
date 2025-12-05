@@ -88,8 +88,8 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         # Right Margin: 1.25 inches * 72 points/inch = 90 points
         right_margin = 90 
         
-        # Vertical Shift: Original 112 + 0.3 inches (22pts) = 134 points
-        shift_down = 134
+        # Vertical Shift: Was 134. Moved UP by .15 inches (11pts) -> 123
+        shift_down = 123
         
         # Calculate usable width constraint
         usable_width = width - left_margin - right_margin
@@ -106,7 +106,7 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         
         # --- 2. The Evidence (Images) ---
         c.setFont("Helvetica-Bold", 12)
-        c.drawString(left_margin, current_y, "Evidence:") # Changed from "The Evidence:"
+        c.drawString(left_margin, current_y, "Evidence:") 
         current_y -= 10
         
         if pil_images:
@@ -160,9 +160,9 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         wrapper = textwrap.TextWrapper(width=wrap_width)
         lines = wrapper.wrap(str(roast_content))
         
-        # Limit lines to ensure single page (approx 15-18 lines)
-        if len(lines) > 18:
-            lines = lines[:18]
+        # Limit lines to ensure single page (approx 15 lines)
+        if len(lines) > 15:
+            lines = lines[:15]
             lines[-1] += "..."
             
         for line in lines:
@@ -171,34 +171,44 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
             
         current_y -= 20 # Gap
         
-        # --- 4. Verdict (Wrapped) ---
-        c.setFont("Helvetica-Bold", 12)
+        # Helper for wrapping Verdict and Santa text
         # Approx char width for 12pt font ~ 7pts
         wrap_width_12 = int(usable_width / 7)
         wrapper_12 = textwrap.TextWrapper(width=wrap_width_12)
+
+        # --- 4. Verdict ---
+        # Label (Bold)
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(left_margin, current_y, "Verdict:")
+        current_y -= 15 
         
-        verdict_lines = wrapper_12.wrap(f"Verdict: {verdict}")
+        # Content (Normal, Wrapped, Next Line)
+        c.setFont("Helvetica", 12)
+        verdict_lines = wrapper_12.wrap(str(verdict))
         for line in verdict_lines:
             c.drawString(left_margin, current_y, line)
             current_y -= 15
             
-        current_y -= 5 # Small gap before comment
+        current_y -= 10 # Gap
         
-        # --- 5. Santa's Commentary (Formatted like Verdict & Wrapped) ---
+        # --- 5. Santa's Commentary ---
+        # Label (Bold)
         c.setFont("Helvetica-Bold", 12)
-        santa_lines = wrapper_12.wrap(f"Santa Says: \"{santa_comment}\"")
+        c.drawString(left_margin, current_y, "Santa Says:")
+        current_y -= 15
+        
+        # Content (Normal, Wrapped, Next Line)
+        c.setFont("Helvetica", 12) 
+        santa_lines = wrapper_12.wrap(f"\"{santa_comment}\"")
         for line in santa_lines:
             c.drawString(left_margin, current_y, line)
             current_y -= 15
             
         current_y -= 15 # Gap
         
-        # --- 6. Score (Formatted like Verdict & Wrapped) ---
-        c.setFont("Helvetica-Bold", 12) # Matched 12pt
-        score_lines = wrapper_12.wrap(f"Score: {score}/10")
-        for line in score_lines:
-             c.drawString(left_margin, current_y, line)
-             current_y -= 15
+        # --- 6. Score ---
+        c.setFont("Helvetica-Bold", 14)
+        c.drawString(left_margin, current_y, f"Score: {score}/10")
 
         c.save()
         buffer.seek(0)
