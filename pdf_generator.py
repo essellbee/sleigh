@@ -71,7 +71,8 @@ def create_certificate_pdf(name, verdict, score, comment, template_path):
 
 def create_roast_report(name, verdict, score, roast_content, pil_images, template_path=None):
     """
-    Generates a multi-page 'Case File' PDF with optimized images and background template.
+    Generates a Single-Page 'Case File' PDF.
+    Simplification: Assumes content fits on one page to ensure template merging works reliably.
     """
     if not reportlab_available:
         return None
@@ -105,13 +106,19 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
         wrapper = textwrap.TextWrapper(width=90) 
         lines = wrapper.wrap(str(roast_content))
         
+        # Limit lines to prevent overflow into images since we are strictly single page now
+        max_lines = 15
+        if len(lines) > max_lines:
+            lines = lines[:max_lines]
+            lines[-1] += "..."
+
         for line in lines:
             c.drawString(50, text_y, line)
             text_y -= 15
             
         text_y -= 20 
         
-        # --- Images (Optimized) ---
+        # --- Images (Optimized & Limited for Single Page) ---
         if pil_images:
             c.setFont("Helvetica-Bold", 14)
             c.drawString(50, text_y, "The Evidence:")
@@ -125,19 +132,17 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
             current_x = x_start
             current_y = text_y - img_height
             
-            for img in pil_images:
-                # Page Break Logic
-                if current_y < 50:
-                    c.showPage()
-                    current_y = height - 50 - shift_down - img_height
-                    current_x = x_start
-                
+            # Limit images to what fits on one row (max 3 or 4) to guarantee single page
+            # standard letter width is 612. 50 margin L, 50 margin R. 512 usable.
+            # 150+20 = 170 per image. 3 images = 510. Perfect fit for 3 images.
+            display_images = pil_images[:3] 
+            
+            for img in display_images:
                 try:
                     # 1. Resize & Compress
                     img_copy = img.copy()
-                    img_copy.thumbnail((800, 800)) # Max 800px dimension
+                    img_copy.thumbnail((800, 800)) 
                     
-                    # Convert transparency to white for JPEG
                     if img_copy.mode in ('RGBA', 'LA') or (img_copy.mode == 'P' and 'transparency' in img_copy.info):
                         background = ImageOps.new('RGB', img_copy.size, (255, 255, 255))
                         if img_copy.mode == 'P':
@@ -147,19 +152,15 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
                     elif img_copy.mode != 'RGB':
                         img_copy = img_copy.convert('RGB')
                         
-                    # 2. Save as JPEG to buffer
                     img_buffer = io.BytesIO()
                     img_copy.save(img_buffer, format='JPEG', quality=85)
                     img_buffer.seek(0)
                     
-                    # 3. Draw onto PDF
+                    # 2. Draw
                     img_reader = ImageReader(img_buffer)
                     c.drawImage(img_reader, current_x, current_y, width=img_width, height=img_height, preserveAspectRatio=True)
                     
                     current_x += img_width + gap
-                    if current_x + img_width > width - 50:
-                        current_x = x_start
-                        current_y -= (img_height + gap)
                         
                 except Exception as img_e:
                     print(f"Image Error: {img_e}")
@@ -168,31 +169,23 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
         c.save()
         buffer.seek(0)
         
-        # --- Template Merging ---
-        # Verify template exists before trying to merge
+        # --- Template Merging (Simple Single Page) ---
         if template_path and os.path.exists(template_path) and pypdf_available:
             try:
                 content_pdf = PdfReader(buffer)
                 template_pdf = PdfReader(open(template_path, "rb"))
-                template_page = template_pdf.pages[0]
+                
+                # Get the Background Page (Template)
+                output_page = template_pdf.pages[0]
+                
+                # Get the Content Page (We just generated this)
+                content_page = content_pdf.pages[0]
+                
+                # Merge content ON TOP of template
+                output_page.merge_page(content_page)
                 
                 output = PdfWriter()
-                
-                for i in range(len(content_pdf.pages)):
-                    content_page = content_pdf.pages[i]
-                    
-                    # Create blank page of same size as template
-                    # This is the robust way to handle repeated backgrounds
-                    output_page = output.add_blank_page(
-                        width=template_page.width, 
-                        height=template_page.height
-                    )
-                    
-                    # 1. Merge Template (Background)
-                    output_page.merge_page(template_page)
-                    
-                    # 2. Merge Content (Foreground)
-                    output_page.merge_page(content_page)
+                output.add_page(output_page)
                 
                 final_stream = io.BytesIO()
                 output.write(final_stream)
@@ -204,7 +197,7 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
                 return buffer
         else:
             if template_path:
-                print(f"Report Template missing or path incorrect: {template_path}")
+                print(f"Report Template missing: {template_path}")
             return buffer
 
     except Exception as e:
