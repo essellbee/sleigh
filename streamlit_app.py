@@ -876,7 +876,8 @@ else:
                 roast_content=data.get('roast_content', "No roast found."),
                 santa_comment=data.get('santa_comment', "Ho Ho Ho!"),
                 pil_images=st.session_state.images,
-                template_path=report_template_test
+                template_path=report_template_test,
+                report_date=time.strftime('%B %d, %Y') 
             )
             
             if test_pdf_bytes:
@@ -936,7 +937,8 @@ else:
                 roast_content=data.get('roast_content', "No roast found."),
                 santa_comment=data.get('santa_comment', "Ho Ho Ho!"),
                 pil_images=st.session_state.images,
-                template_path=report_template
+                template_path=report_template,
+                report_date=time.strftime('%B %d, %Y')
             )
             
             if pdf_bytes:
@@ -976,7 +978,7 @@ else:
                 st.info("📋 Ready to share! (Copy the text above)")
                 st.code(share_text)
             
-            if st.button("START OVER", key="restart_unpaid", use_container_width=True):
+            if st.button("START OVER", use_container_width=True):
                 st.session_state.result = None
                 st.session_state.images = None
                 st.session_state.rotation_angles = {}
