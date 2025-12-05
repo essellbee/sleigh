@@ -40,24 +40,8 @@ def create_certificate_pdf(name, verdict, score, comment, template_path):
         # --- Text Overlay Logic ---
         
         # 1. The Name (Prominent, Center)
-        c.setFont("Helvetica-Bold", 36)
-        c.drawCentredString(center_x, 280, str(name)) 
-        
-        # 2. The Verdict (Sleigh or Nay)
-        c.setFont("Helvetica-Bold", 24)
-        c.drawCentredString(center_x, 220, str(verdict))
-        
-        # 3. The Score
-        c.setFont("Helvetica", 18)
-        c.drawCentredString(center_x, 190, f"Spirit Score: {score}/10")
-        
-        # 4. The Comment (Santa's Roast/Praise)
-        c.setFont("Helvetica-Oblique", 12)
-        # Simple truncation to prevent overflow
-        clean_comment = str(comment).replace('\n', ' ')
-        if len(clean_comment) > 90:
-            clean_comment = clean_comment[:90] + "..."
-        c.drawCentredString(center_x, 160, f'"{clean_comment}"')
+        c.setFont("Times-Bold", 44)
+        c.drawCentredString(center_x, 240, str(name)) 
 
         c.save()
         packet.seek(0)
