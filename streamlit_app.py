@@ -978,7 +978,7 @@ else:
                 st.info("📋 Ready to share! (Copy the text above)")
                 st.code(share_text)
             
-            if st.button("START OVER", use_container_width=True):
+            if st.button("START OVER", key="restart_unpaid", use_container_width=True):
                 st.session_state.result = None
                 st.session_state.images = None
                 st.session_state.rotation_angles = {}
