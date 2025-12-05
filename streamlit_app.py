@@ -874,6 +874,8 @@ else:
                     mime="application/pdf",
                     use_container_width=True
                 )
+            else:
+                st.warning("⚠️ Certificate Generator failed. Ensure 'reportlab' and 'pypdf' are in requirements.txt.")
             
             if test_report_bytes:
                 st.download_button(
@@ -883,8 +885,10 @@ else:
                     mime="application/pdf",
                     use_container_width=True
                 )
+            else:
+                st.warning("⚠️ Case File Generator failed.")
         except Exception as e:
-            print(f"Test Button Generation Failed: {e}")
+            st.error(f"Test Button Generation Failed: {e}")
         # -----------------------------------------------
 
         if payment_verified:
