@@ -481,10 +481,12 @@ def rotate_image(img, angle):
     """Rotate image by specified angle"""
     return img.rotate(angle, expand=True)
 
+# UPDATED: Removed st.error() calls from background thread function
 def get_elf_verdict(images):
     """Sends images to Gemini and returns JSON verdict."""
     if not api_key:
-        st.error("Missing API Key! Please set GEMINI_API_KEY in .streamlit/secrets.toml")
+        # DO NOT use st.error here, it runs in a thread!
+        print("Missing API Key")
         return None
 
     genai.configure(api_key=api_key)
@@ -513,7 +515,6 @@ def get_elf_verdict(images):
         text = response.text.replace('```json', '').replace('```', '')
         return json.loads(text)
     except Exception as e:
-        # Avoid st.error here as it might break in threads; just return None
         print(f"Elf-GPT crashed: {e}") 
         return None
 
@@ -627,7 +628,10 @@ if st.session_state.result is None:
         st.markdown("<br>", unsafe_allow_html=True)
         
         if st.button("SUBMIT", use_container_width=True):
-            if len(all_files) > 5:
+            # Check API key HERE in main thread
+            if not api_key:
+                st.error("⚠️ Missing API Key! Please configure your secrets.")
+            elif len(all_files) > 5:
                 st.warning("⚠️ Limit 5 photos! The elves can only process so much...")
             else:
                 # Load images with applied rotations
@@ -663,7 +667,7 @@ if st.session_state.result is None:
                     "📏 Measuring your holiday cheer coefficient...",
                     "💡 Untangling the Christmas tree lights...",
                     "🥕 Feeding carrots to the reindeer...",
-                    "❄️ analyzing snow composition...",
+                    "❄️ Analyzing snow composition...",
                     "🧝‍♂️ Consulting the High Council of Elves...",
                     "🍪 Quality testing Santa's cookies...",
                     "📜 Scanning the Naughty & Nice database..."
@@ -680,6 +684,7 @@ if st.session_state.result is None:
                 api_thread.start()
 
                 # Animation loop while waiting
+                start_time = time.time()
                 msg_index = 0
                 while api_thread.is_alive():
                     # Pick a message (cycle or random)
@@ -697,9 +702,13 @@ if st.session_state.result is None:
                     # Wait a bit before next update
                     time.sleep(2)
                     msg_index = random.randint(0, len(loading_texts) - 1)
+                    
+                    # Timeout after 60 seconds
+                    if time.time() - start_time > 60:
+                        break
 
                 # Thread finished
-                api_thread.join()
+                api_thread.join(timeout=1) # Ensure thread is done
                 result = result_container['data']
                 
                 # Clear progress bar
@@ -710,6 +719,8 @@ if st.session_state.result is None:
                     # Clear rotations when submitting
                     st.session_state.rotation_angles = {}
                     st.rerun()
+                else:
+                    st.error("Oh no! The elves encountered a connection error. Please try submitting again.")
 
     # Video Frame with image
     st.markdown('<div class="gold-frame">', unsafe_allow_html=True)
@@ -875,7 +886,7 @@ else:
                     use_container_width=True
                 )
             else:
-                st.warning("⚠️ Certificate Generator failed. Ensure 'reportlab' and 'pypdf' are in requirements.txt.")
+                st.warning("⚠️ Certificate generation returned None.")
             
             if test_report_bytes:
                 st.download_button(
@@ -886,7 +897,7 @@ else:
                     use_container_width=True
                 )
             else:
-                st.warning("⚠️ Case File Generator failed.")
+                st.warning("⚠️ Case File generation returned None.")
         except Exception as e:
             st.error(f"Test Button Generation Failed: {e}")
         # -----------------------------------------------
