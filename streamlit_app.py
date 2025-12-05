@@ -836,19 +836,24 @@ else:
         try:
             # Reuse logic to determine template
             is_sleigh_test = score >= 7
-            template_path_test = "assets/certificate_nice.pdf" if is_sleigh_test else "assets/certificate_naughty.pdf"
+            
+            # Determine templates
+            cert_template_test = "assets/certificate_nice.pdf" if is_sleigh_test else "assets/certificate_naughty.pdf"
+            report_template_test = "assets/elf_report_sleigh.pdf" if is_sleigh_test else "assets/elf_report_nay.pdf"
             
             # Use stored name or fallback
             name_on_cert_test = st.session_state.get("user_name", "Test User")
             if not name_on_cert_test:
                 name_on_cert_test = "Test User"
+            
+            safe_name_test = name_on_cert_test.strip().replace(" ", "_")
 
             test_pdf_bytes = pdf_generator.create_certificate_pdf(
                 name=name_on_cert_test,
                 verdict=data.get('verdict_title', "Sleigh or Nay?"),
                 score=score,
                 comment=data.get('santa_comment', "Ho Ho Ho!"),
-                template_path=template_path_test
+                template_path=cert_template_test
             )
             
             # Generate the Case File
@@ -857,28 +862,24 @@ else:
                 verdict=data.get('verdict_title', "Sleigh or Nay?"),
                 score=score,
                 roast_content=data.get('roast_content', "No roast found."),
-                pil_images=st.session_state.images
+                pil_images=st.session_state.images,
+                template_path=report_template_test
             )
             
             if test_pdf_bytes:
-                # Create dynamic filename for test
-                safe_name_test = name_on_cert_test.strip().replace(" ", "_")
-                type_str_test = "nice" if is_sleigh_test else "naughty"
-                
                 st.download_button(
                     label="🛠️ TEST: Download Filled Certificate PDF",
                     data=test_pdf_bytes,
-                    file_name=f"certificate_{type_str_test}_{safe_name_test}.pdf",
+                    file_name="Santa_Certificate_TEST.pdf",
                     mime="application/pdf",
                     use_container_width=True
                 )
-                
+            
             if test_report_bytes:
-                safe_name_test = name_on_cert_test.strip().replace(" ", "_")
                 st.download_button(
                     label="🛠️ TEST: Download Case File PDF",
                     data=test_report_bytes,
-                    file_name=f"case_file_{safe_name_test}.pdf",
+                    file_name=f"Official_Elf_Report_{safe_name_test}.pdf",
                     mime="application/pdf",
                     use_container_width=True
                 )
@@ -891,12 +892,15 @@ else:
             
             # Select Template based on score/verdict
             is_sleigh = score >= 7
-            template_path = "assets/certificate_nice.pdf" if is_sleigh else "assets/certificate_naughty.pdf"
+            cert_template = "assets/certificate_nice.pdf" if is_sleigh else "assets/certificate_naughty.pdf"
+            report_template = "assets/elf_report_sleigh.pdf" if is_sleigh else "assets/elf_report_nay.pdf"
             
             # Use stored name or fallback
             name_on_cert = st.session_state.get("user_name", "Valued Elf-Enthusiast")
             if not name_on_cert:
                 name_on_cert = "Valued Elf-Enthusiast"
+            
+            safe_name = name_on_cert.strip().replace(" ", "_")
 
             # Generate the PDF Certificate using the utility module
             pdf_bytes = pdf_generator.create_certificate_pdf(
@@ -904,7 +908,7 @@ else:
                 verdict=data.get('verdict_title', "Sleigh or Nay?"),
                 score=score,
                 comment=data.get('santa_comment', "Ho Ho Ho!"),
-                template_path=template_path
+                template_path=cert_template
             )
             
             # Generate the Case File
@@ -913,12 +917,12 @@ else:
                 verdict=data.get('verdict_title', "Sleigh or Nay?"),
                 score=score,
                 roast_content=data.get('roast_content', "No roast found."),
-                pil_images=st.session_state.images
+                pil_images=st.session_state.images,
+                template_path=report_template
             )
             
             if pdf_bytes:
                 # Create dynamic filename
-                safe_name = name_on_cert.strip().replace(" ", "_")
                 type_str = "nice" if is_sleigh else "naughty"
                 
                 st.download_button(
@@ -930,11 +934,10 @@ else:
                 )
                 
             if report_bytes:
-                safe_name = name_on_cert.strip().replace(" ", "_")
                 st.download_button(
                     label="📥 DOWNLOAD FULL CASE FILE",
                     data=report_bytes,
-                    file_name=f"case_file_{safe_name}.pdf",
+                    file_name=f"Official_Elf_Report_{safe_name}.pdf",
                     mime="application/pdf",
                     use_container_width=True
                 )
