@@ -24,7 +24,7 @@ except ImportError:
 # --- APP CONFIGURATION ---
 st.set_page_config(
     page_title="Sleigh or Nay?",
-    page_icon="🎅",
+    page_icon="",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -593,7 +593,7 @@ st.markdown(f"""
 if st.session_state.result is None:
     # --- SCREEN 1: HOME ---
     
-    st.markdown('<div class="intro-text">Santa is jumping on the AI bandwagon and outsourcing.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="intro-text">Santa is jumping on the AI bandwagon and outsourcing as much as he can this year.</div>', unsafe_allow_html=True)
     
     # File uploader
     uploaded_files = st.file_uploader(
