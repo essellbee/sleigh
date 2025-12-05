@@ -3,4 +3,3 @@ google-generativeai
 Pillow
 reportlab
 pypdf
-stripe
