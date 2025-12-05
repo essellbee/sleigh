@@ -8,9 +8,11 @@ import base64
 import os
 import threading
 import streamlit.components.v1 as components
+import importlib
 
-# Import the new PDF generator
+# Import the new PDF generator AND FORCE RELOAD to fix cache issues
 import pdf_generator
+importlib.reload(pdf_generator)
 
 # Try to import stripe for secure verification
 try:
