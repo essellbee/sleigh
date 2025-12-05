@@ -850,15 +850,29 @@ else:
             template_path=template_path_test
         )
         
+        # Generate the Case File
+        test_report_bytes = pdf_generator.create_roast_report(
+            name=name_on_cert_test,
+            verdict=data.get('verdict_title', "Sleigh or Nay?"),
+            score=score,
+            roast_content=data.get('roast_content', "No roast found."),
+            pil_images=st.session_state.images
+        )
+        
         if test_pdf_bytes:
-            # Create dynamic filename for test
-            safe_name_test = name_on_cert_test.strip().replace(" ", "_")
-            type_str_test = "nice" if is_sleigh_test else "naughty"
-            
             st.download_button(
                 label="🛠️ TEST: Download Filled Certificate PDF",
                 data=test_pdf_bytes,
-                file_name=f"certificate_{type_str_test}_{safe_name_test}.pdf",
+                file_name="Santa_Certificate_TEST.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
+            
+        if test_report_bytes:
+            st.download_button(
+                label="🛠️ TEST: Download Case File PDF",
+                data=test_report_bytes,
+                file_name="Case_File_TEST.pdf",
                 mime="application/pdf",
                 use_container_width=True
             )
