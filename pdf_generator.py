@@ -103,19 +103,22 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
         c = canvas.Canvas(buffer, pagesize=letter)
         width, height = letter
         
+        # SHIFT DOWN: 1.25 inches * 72 points/inch = 90 points
+        shift_down = 90
+        
         # --- Header ---
         c.setFont("Helvetica-Bold", 24)
-        c.drawString(50, height - 50, "Elf-GPT: Official Case File")
+        c.drawString(50, height - 50 - shift_down, "Elf-GPT: Official Case File")
         
         c.setFont("Helvetica", 12)
-        c.drawString(50, height - 80, f"Subject: {name}")
-        c.drawString(50, height - 100, f"Verdict: {verdict} (Score: {score}/10)")
+        c.drawString(50, height - 80 - shift_down, f"Subject: {name}")
+        c.drawString(50, height - 100 - shift_down, f"Verdict: {verdict} (Score: {score}/10)")
         
         c.setLineWidth(1)
-        c.line(50, height - 110, width - 50, height - 110)
+        c.line(50, height - 110 - shift_down, width - 50, height - 110 - shift_down)
         
         # --- Roast Content ---
-        text_y = height - 140
+        text_y = height - 140 - shift_down
         c.setFont("Helvetica-Bold", 14)
         c.drawString(50, text_y, "The Assessment:")
         text_y -= 20
@@ -150,7 +153,8 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
                 # Check page break
                 if current_y < 50:
                     c.showPage()
-                    current_y = height - 50 - img_height
+                    # Reset to top, maintaining the shift for the background template
+                    current_y = height - 50 - shift_down - img_height
                     current_x = x_start
                 
                 try:
@@ -204,15 +208,17 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
                 for i in range(len(content_pdf.pages)):
                     content_page = content_pdf.pages[i]
                     
-                    # Add the template page to the output
-                    # This adds a reference to the template page
-                    output.add_page(template_page)
+                    # Create a blank page with template dimensions
+                    output_page = output.add_blank_page(
+                        width=template_page.width, 
+                        height=template_page.height
+                    )
                     
-                    # Get the reference to the page we just added (the last one)
-                    current_output_page = output.pages[-1]
+                    # Merge template (background)
+                    output_page.merge_page(template_page)
                     
-                    # Merge the content ON TOP of the template
-                    current_output_page.merge_page(content_page)
+                    # Merge content (foreground)
+                    output_page.merge_page(content_page)
                 
                 final_stream = io.BytesIO()
                 output.write(final_stream)
