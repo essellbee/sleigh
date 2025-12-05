@@ -75,9 +75,9 @@ def create_certificate_pdf(name, verdict, score, comment, template_path):
         print(f"PDF Generation Error (Certificate): {e}")
         return None
 
-def create_roast_report(name, verdict, score, roast_content, pil_images):
+def create_roast_report(name, verdict, score, roast_content, pil_images, template_path=None):
     """
-    Generates a 'Case File' PDF.
+    Generates a 'Case File' PDF with background template support.
     """
     if not reportlab_available:
         return None
@@ -152,6 +152,40 @@ def create_roast_report(name, verdict, score, roast_content, pil_images):
 
         c.save()
         buffer.seek(0)
+        
+        # --- Merge with Template (Multi-page support) ---
+        if template_path and os.path.exists(template_path) and pypdf_available:
+            try:
+                content_pdf = PdfReader(buffer)
+                template_pdf = PdfReader(open(template_path, "rb"))
+                template_page = template_pdf.pages[0]
+                
+                output = PdfWriter()
+                
+                for i in range(len(content_pdf.pages)):
+                    content_page = content_pdf.pages[i]
+                    
+                    # Create a blank page with template dimensions
+                    output_page = output.add_blank_page(
+                        width=template_page.width, 
+                        height=template_page.height
+                    )
+                    
+                    # Merge template first (background)
+                    output_page.merge_page(template_page)
+                    
+                    # Merge content on top
+                    output_page.merge_page(content_page)
+                
+                final_stream = io.BytesIO()
+                output.write(final_stream)
+                final_stream.seek(0)
+                return final_stream
+            except Exception as e:
+                print(f"Template merge error: {e}")
+                buffer.seek(0)
+                return buffer # Return raw content if merge fails
+                
         return buffer
     except Exception as e:
         print(f"PDF Generation Error (Report): {e}")
