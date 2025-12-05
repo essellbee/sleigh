@@ -348,6 +348,11 @@ st.markdown("""
         padding: 0 !important;
     }
 
+    /* Hide the file size text (e.g. "1.2MB") in the file uploader list */
+    [data-testid="stFileUploader"] small {
+        display: none !important;
+    }
+
     /* Center and style the file uploader label to match app text */
     .stFileUploader label {
         width: 100%;
