@@ -853,12 +853,12 @@ else:
         if test_pdf_bytes:
             # Create dynamic filename for test
             safe_name_test = name_on_cert_test.strip().replace(" ", "_")
-            type_str_test = "nice" if is_sleigh_test else "naughty"
+            type_str_test = "Nice" if is_sleigh_test else "Naughty"
             
             st.download_button(
                 label="🛠️ TEST: Download Filled Certificate PDF",
                 data=test_pdf_bytes,
-                file_name=f"certificate_{type_str_test}_{safe_name_test}.pdf",
+                file_name=f"Santa_Certificate_2025_{safe_name_test}.pdf",
                 mime="application/pdf",
                 use_container_width=True
             )
