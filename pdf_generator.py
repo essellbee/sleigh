@@ -108,9 +108,9 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         current_y -= 10
         
         if pil_images:
-            # Force layout for 5 columns
-            slots_across = 5
-            gap = 5 
+            # Force size for 2 across (for larger thumbnails)
+            slots_across = 2
+            gap = 10 
             
             # Calculate maximum dimensions for a single slot
             max_slot_w = (usable_width - (gap * (slots_across - 1))) / slots_across
@@ -120,8 +120,8 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
             row_bottom_y = current_y - max_slot_h
             current_x = left_margin
             
-            # Draw up to 5 images
-            display_images = pil_images[:5]
+            # Draw up to 2 images (per updated limit)
+            display_images = pil_images[:2]
             
             for img in display_images:
                 try:
@@ -170,20 +170,21 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         c.drawString(left_margin, current_y, "Official Elf Assessment:")
         current_y -= 15
         
-        c.setFont("Helvetica", 10)
-        # Calculate char wrap based on usable width
-        wrap_width = int(usable_width / 6) 
+        c.setFont("Helvetica", 12) # UPDATED to 12pt
+        
+        # Calculate char wrap based on usable width (approx 7 pts per char for 12pt font)
+        wrap_width = int(usable_width / 7) 
         wrapper = textwrap.TextWrapper(width=wrap_width)
         lines = wrapper.wrap(str(roast_content))
         
-        # Limit lines to ensure single page
-        if len(lines) > 15:
-            lines = lines[:15]
+        # Limit lines to ensure single page (approx 12-14 lines with larger font)
+        if len(lines) > 14:
+            lines = lines[:14]
             lines[-1] += "..."
             
         for line in lines:
             c.drawString(left_margin, current_y, line)
-            current_y -= 12
+            current_y -= 15 # Increased spacing for larger font
             
         current_y -= 20 # Gap
         
