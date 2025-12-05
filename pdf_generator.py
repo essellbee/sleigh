@@ -84,7 +84,9 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         
         # --- Layout Constants ---
         left_margin = 50 
-        right_margin = 90 # 1.25 inches
+        # Right Margin: Reduced by 0.25 inches. 
+        # Previous: 90pts (1.25in). New: 72pts (1.0in)
+        right_margin = 72 
         
         # Vertical Shift
         shift_down = 134
@@ -113,7 +115,7 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
             gap = 10 
             
             # Calculate maximum dimensions for a single slot
-            # Reduced by 25% as requested
+            # Reduced by 25% as requested previously
             max_slot_w = ((usable_width - (gap * (slots_across - 1))) / slots_across) * 0.75
             max_slot_h = max_slot_w # Use square bounding box for row height
             
