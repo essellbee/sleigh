@@ -40,8 +40,24 @@ def create_certificate_pdf(name, verdict, score, comment, template_path):
         # --- Text Overlay Logic ---
         
         # 1. The Name (Prominent, Center)
-        c.setFont("Times-Bold", 44)
-        c.drawCentredString(center_x, 240, str(name)) 
+        c.setFont("Helvetica-Bold", 36)
+        c.drawCentredString(center_x, 280, str(name)) 
+        
+        # 2. The Verdict (Sleigh or Nay)
+        c.setFont("Helvetica-Bold", 24)
+        c.drawCentredString(center_x, 220, str(verdict))
+        
+        # 3. The Score
+        c.setFont("Helvetica", 18)
+        c.drawCentredString(center_x, 190, f"Spirit Score: {score}/10")
+        
+        # 4. The Comment (Santa's Roast/Praise)
+        c.setFont("Helvetica-Oblique", 12)
+        # Simple truncation to prevent overflow
+        clean_comment = str(comment).replace('\n', ' ')
+        if len(clean_comment) > 90:
+            clean_comment = clean_comment[:90] + "..."
+        c.drawCentredString(center_x, 160, f'"{clean_comment}"')
 
         c.save()
         packet.seek(0)
@@ -77,6 +93,7 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
     """
     Generates a 'Case File' PDF containing the full roast and evidence photos.
     Supports overlaying onto a multi-page background template.
+    Includes image compression to reduce file size.
     """
     if not reportlab_available:
         return None
@@ -137,9 +154,22 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
                     current_x = x_start
                 
                 try:
-                    # Convert PIL image to ReportLab ImageReader
+                    # OPTIMIZATION: Resize and Compress Image
+                    img_copy = img.copy()
+                    # Resize to a reasonable max dimension (e.g., 800px)
+                    img_copy.thumbnail((800, 800))
+                    
+                    # Convert to RGB (remove alpha channel if PNG) to allow JPEG compression
+                    if img_copy.mode in ('RGBA', 'LA'):
+                        background = ImageOps.new('RGB', img_copy.size, (255, 255, 255))
+                        background.paste(img_copy, mask=img_copy.split()[-1])
+                        img_copy = background
+                    elif img_copy.mode != 'RGB':
+                        img_copy = img_copy.convert('RGB')
+                        
                     img_buffer = io.BytesIO()
-                    img.save(img_buffer, format='PNG')
+                    # Save as JPEG with 85% quality to drastically reduce size
+                    img_copy.save(img_buffer, format='JPEG', quality=85)
                     img_buffer.seek(0)
                     img_reader = ImageReader(img_buffer)
                     
@@ -166,7 +196,7 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
                 
                 # Read the background template
                 template_pdf = PdfReader(open(template_path, "rb"))
-                template_page = template_pdf.pages[0]
+                template_page = template_pdf.pages[0] # Assume template is single page background
                 
                 output = PdfWriter()
                 
@@ -174,17 +204,15 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
                 for i in range(len(content_pdf.pages)):
                     content_page = content_pdf.pages[i]
                     
-                    # Create a blank page with template dimensions
-                    output_page = output.add_blank_page(
-                        width=template_page.width, 
-                        height=template_page.height
-                    )
+                    # Add the template page to the output
+                    # This adds a reference to the template page
+                    output.add_page(template_page)
                     
-                    # Merge template (background)
-                    output_page.merge_page(template_page)
+                    # Get the reference to the page we just added (the last one)
+                    current_output_page = output.pages[-1]
                     
-                    # Merge content (foreground)
-                    output_page.merge_page(content_page)
+                    # Merge the content ON TOP of the template
+                    current_output_page.merge_page(content_page)
                 
                 final_stream = io.BytesIO()
                 output.write(final_stream)
@@ -197,6 +225,8 @@ def create_roast_report(name, verdict, score, roast_content, pil_images, templat
                 return buffer # Return un-merged PDF if merge fails
         else:
             # If no template found, just return the white background PDF
+            if template_path:
+                print(f"Template not found: {template_path}")
             return buffer
 
     except Exception as e:
