@@ -158,10 +158,10 @@ st.markdown("""
         width: 100%;
         background: linear-gradient(180deg, #5FBA47 0%, #4BA639 100%);
         color: white !important;
-        font-family: 'Helvetica', 'Arial', sans-serif; /* Changed to Helvetica */
-        font-size: clamp(1.2rem, 4vw, 1.5rem);
-        font-weight: bold; /* Bold */
-        /* Removed text-transform: uppercase */
+        font-family: 'Helvetica', 'Arial', sans-serif !important;
+        font-size: clamp(1.2rem, 4vw, 1.5rem) !important;
+        font-weight: 900 !important;
+        text-transform: none !important;
         border-radius: 50px;
         padding: 18px 25px;
         border: none;
@@ -174,12 +174,25 @@ st.markdown("""
         text-decoration: none;
     }
 
+    /* Force inner text elements to inherit styles - CRITICAL FIX */
+    div.stButton > button p, div.stLinkButton > a p, div.stDownloadButton > button p {
+        color: white !important;
+        font-weight: 900 !important;
+        font-family: 'Helvetica', 'Arial', sans-serif !important;
+        font-size: clamp(1.2rem, 4vw, 1.5rem) !important;
+    }
+
     div.stButton > button:hover, div.stLinkButton > a:hover, div.stDownloadButton > button:hover {
         background: linear-gradient(180deg, #6FCA57 0%, #5BA749 100%);
         transform: translateY(-2px);
         box-shadow: 0px 8px 0px #357A2B, 0px 10px 20px rgba(0,0,0,0.25);
         color: white !important;
         border: none;
+    }
+    
+    /* Force hover text color */
+    div.stButton > button:hover p, div.stLinkButton > a:hover p, div.stDownloadButton > button:hover p {
+        color: white !important;
     }
     
     div.stButton > button:active, div.stLinkButton > a:active, div.stDownloadButton > button:active {
