@@ -83,13 +83,12 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         width, height = letter # 612 x 792 points
         
         # --- Layout Constants ---
-        left_margin = 50
+        # Reduced margins to provide more space (less padding)
+        left_margin = 30
+        right_margin = 30
         
-        # Right Margin: 1.25 inches * 72 points/inch = 90 points
-        right_margin = 90 
-        
-        # Vertical Shift: Was 134. Moved UP by .15 inches (11pts) -> 123
-        shift_down = 123
+        # Vertical Shift
+        shift_down = 134
         
         # Calculate usable width constraint
         usable_width = width - left_margin - right_margin
@@ -110,19 +109,19 @@ def create_roast_report(name, verdict, score, roast_content, santa_comment, pil_
         current_y -= 10
         
         if pil_images:
-            # Force size for 4 across regardless of actual count to increase size slightly
-            slots_across = 4
+            # Force size for 5 across regardless of actual count (thumbnails)
+            slots_across = 5
             gap = 5
             
-            # Calculate dimension for a single slot in a 4-column grid
+            # Calculate dimension for a single slot in a 5-column grid
             img_w = (usable_width - (gap * (slots_across - 1))) / slots_across
             img_h = img_w # Square thumbnails
             
             img_y_pos = current_y - img_h
             current_x = left_margin
             
-            # Draw up to 4 images
-            display_images = pil_images[:4]
+            # Draw up to 5 images
+            display_images = pil_images[:5]
             
             for img in display_images:
                 try:
