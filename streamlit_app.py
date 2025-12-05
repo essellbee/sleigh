@@ -649,11 +649,11 @@ if st.session_state.result is None:
             elif len(all_files) > 2: # Reduced Limit to 2
                 st.warning("Limit 2 photos! The elves can only process so much...")
             else:
-            # The Payment Link
-            st.link_button("Buy Official Certificate", "https://buy.stripe.com/dRm8wQcNt33n0FO9pAasg00", use_container_width=True)
-            
-            if st.button("Post Your Roast", use_container_width=True):
-                share_text = f"{verdict_title}\n\nScore: {score}/10\n\n{data.get('roast_content', '')[:100]}..."
+                # Load images with applied rotations
+                pil_images = []
+                for idx, file in enumerate(all_files):
+                    # Check if this is the camera photo
+                    file_key = f"upload_{idx}"
                     
                     img = load_image_preserve_orientation(file)
                     
@@ -974,7 +974,7 @@ else:
              
     else:
         # The Payment Link
-        st.link_button("Buy Official Certificate", "https://buy.stripe.com/test_00w00k29UepK8l23bN4ZG00", use_container_width=True)
+        st.link_button("Buy Official Certificate", "https://buy.stripe.com/dRm8wQcNt33n0FO9pAasg00", use_container_width=True)
         
         if st.button("Post Your Roast", use_container_width=True):
             share_text = f"{verdict_title}\n\nScore: {score}/10\n\n{data.get('roast_content', '')[:100]}..."
