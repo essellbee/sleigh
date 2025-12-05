@@ -481,7 +481,6 @@ def rotate_image(img, angle):
     """Rotate image by specified angle"""
     return img.rotate(angle, expand=True)
 
-# UPDATED: Removed st.error() calls from background thread function
 def get_elf_verdict(images):
     """Sends images to Gemini and returns JSON verdict."""
     if not api_key:
@@ -873,6 +872,7 @@ else:
                 verdict=data.get('verdict_title', "Sleigh or Nay?"),
                 score=score,
                 roast_content=data.get('roast_content', "No roast found."),
+                santa_comment=data.get('santa_comment', "Ho Ho Ho!"),
                 pil_images=st.session_state.images,
                 template_path=report_template_test
             )
@@ -932,6 +932,7 @@ else:
                 verdict=data.get('verdict_title', "Sleigh or Nay?"),
                 score=score,
                 roast_content=data.get('roast_content', "No roast found."),
+                santa_comment=data.get('santa_comment', "Ho Ho Ho!"),
                 pil_images=st.session_state.images,
                 template_path=report_template
             )
