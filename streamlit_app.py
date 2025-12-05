@@ -724,9 +724,7 @@ if st.session_state.result is None:
                     st.error("Oh no! The elves encountered a connection error. Please try submitting again.")
 
     # Video Frame with image
-    st.markdown('<div class="gold-frame">', unsafe_allow_html=True)
-    
-    # Try to load the Santa frame image, fallback to text if not found
+    # Removed gold-frame wrapper, just showing image
     try:
         st.image("assets/santa_frame.png", use_container_width=True)
     except:
@@ -739,8 +737,6 @@ if st.session_state.result is None:
                 </div>
             </div>
         """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
 else:
     # --- SCREEN 2: RESULTS ---
